@@ -1,0 +1,7 @@
+{% extends 'users/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <p>Hi, {{user.username}}! You're logged in :)</p>
+    </div>
+{% endblock %}
