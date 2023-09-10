@@ -1,0 +1,36 @@
+{% extends 'users/base.html' %}
+{% block content %}
+<p>Strona domowa przepisów</p>
+    <a href="{% url 'recepies_add' %}" class="btn btn-primary" role="button">Dodaj</a>
+    <button type="button" class="btn btn-primary" type="submit">Edytuj</button>
+    <button type="button" class="btn btn-danger" type="submit">Usuń</button>
+{% if recepies %}
+    <table id="recepies-table">
+        <thead>
+            <tr>
+                <th scope="col">Nr.</th>
+                <th scope="col">Nazwa przepisu</th>
+                <th scope="col">Składniki</th>
+                <th scope="col">Sposób przygotowania</th>
+                <th scope="col">Tagi</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for recepie in recepies %}
+            <tr>
+                <th scope="row">{{ recepie.id }}</th>
+                <td>{{ recepie.recepie_name }}</td>
+                <td>{{ recepie.ingredients }}</td>
+                <td>{{ recepie.preparation }}</td>
+                {% if recepie.tags %}
+                    <td>{{ recepie.tags }}</td>
+                {% endif %}
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    {{ recepie.ingredients }}
+{% else %}
+    <p>Dodaj przepis</p>
+{% endif %}
+{% endblock %}

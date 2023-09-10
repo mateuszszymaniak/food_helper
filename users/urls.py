@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import MyLoginView, MyResetPasswordView
@@ -22,4 +22,5 @@ urlpatterns = [
         MyResetPasswordView.as_view(template_name="users/reset_password.html"),
         name="reset_password_page",
     ),
+    path("recepie/", include("recepies.urls")),
 ]
