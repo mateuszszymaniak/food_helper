@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "users.apps.UserConfig",
+    "fridges.apps.FridgesConfig",
     "crispy_forms",
     "crispy_bootstrap4",
     "django.contrib.admin",
