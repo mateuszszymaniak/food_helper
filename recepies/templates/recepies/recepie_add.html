@@ -11,7 +11,16 @@
                 {{ form.recepie_form.recepie_name|as_crispy_field }}
                 Ingredient
                 <table id="ingredient-table">
+                    <thead>
+                        <tr>
+                            <td>Quantity</td>
+                            <td>Name</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
 
+                    </tbody>
                 </table>
                 <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
                 {{ form.recepie_form.preparation|as_crispy_field }}
@@ -29,13 +38,23 @@
         const newRow = document.createElement("tr");
 
         const newQuantityInput = document.createElement("td");
-        newQuantityInput.innerHTML = `<div id="div_id_quantity" class="form-group"> <label for="id_quantity" class=" requiredField">Quantity<span class="asteriskField">*</span> </label> <div> <input type="text" name="quantity-${rowNumber}" maxlength="15" class="textinput form-control" required="" id="id_quantity"> </div> </div>`;
+        //newQuantityInput.innerHTML = `<div id="div_id_quantity" class="form-group"> <label for="id_quantity" class=" requiredField">Quantity<span class="asteriskField">*</span> </label> <div> <input type="text" name="quantity-${rowNumber}" maxlength="15" class="textinput form-control" required="" id="id_quantity"> </div> </div>`;
+        newQuantityInput.innerHTML = `<input type="text" name="quantity-${rowNumber}" maxlength="15" class="textinput form-control" required="" id="id_quantity">`
 
         const newNameInput = document.createElement("td");
-        newNameInput.innerHTML = `<div id="div_id_name" class="form-group"><label for="id_name" class=" requiredField">Name<span class="asteriskField">*</span></label><div><input type="text" name="name-${rowNumber}" maxlength="50" class="textinput form-control" required="" id="id_name"></div></div>`;
+        //newNameInput.innerHTML = `<div id="div_id_name" class="form-group"><label for="id_name" class=" requiredField">Name<span class="asteriskField">*</span></label><div><input type="text" name="name-${rowNumber}" maxlength="50" class="textinput form-control" required="" id="id_name"></div></div>`;
+        newNameInput.innerHTML = `<input type="text" name="name-${rowNumber}" maxlength="50" class="textinput form-control" required="" id="id_name">`
+
+        const deleteCell = document.createElement("td");
+        //deleteCell.classList.add("align-center");
+        //deleteCell.style.verticalAlign = "center";
+        deleteCell.innerHTML = `<button type="button" name="delete-${rowNumber}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+
+        //deleteCell.appendChild(deleteButton);
 
         newRow.appendChild(newQuantityInput);
         newRow.appendChild(newNameInput);
+        newRow.appendChild(deleteCell);
         table.appendChild(newRow);
         /*const table = document.getElementById('ingredient-table');
         const rowNumber = document.getElementById('ingredient-table').rows.length;
@@ -59,6 +78,12 @@
 
         //document.getElementById('ingredient-table').appendChild(newRow);
     }
+
+    function delete_ingredient(button){
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
     </script>
 {% endblock %}
 
