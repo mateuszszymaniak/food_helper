@@ -1,0 +1,61 @@
+{% extends 'users/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<p>Tutaj powinien być formularz dodawania przepisu</p>
+
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Dodaj przepis!</legend>
+                {{ form.recepie_form.recepie_name|as_crispy_field }}
+                Ingredient
+                <table id="ingredient-table">
+                    <thead>
+                        <tr>
+                            <td>Quantity</td>
+                            <td>Name</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
+                {{ form.recepie_form.preparation|as_crispy_field }}
+                {{ form.recepie_form.tags|as_crispy_field }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Dodaj</button>
+            </div>
+        </form>
+    </div>
+    <script>
+    function add_ingredient(){
+        const rowNumber = document.getElementById('ingredient-table').rows.length;
+        const table = document.getElementById('ingredient-table');
+        const newRow = document.createElement("tr");
+
+        const newQuantityInput = document.createElement("td");
+        newQuantityInput.innerHTML = `<input type="text" name="quantity-${rowNumber}" maxlength="15" class="textinput form-control" required="" id="id_quantity">`
+
+        const newNameInput = document.createElement("td");
+        newNameInput.innerHTML = `<input type="text" name="name-${rowNumber}" maxlength="50" class="textinput form-control" required="" id="id_name">`
+
+        const deleteCell = document.createElement("td");
+        deleteCell.innerHTML = `<button type="button" name="delete-${rowNumber}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+
+        newRow.appendChild(newQuantityInput);
+        newRow.appendChild(newNameInput);
+        newRow.appendChild(deleteCell);
+        table.appendChild(newRow);
+    }
+
+    function delete_ingredient(button){
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    </script>
+{% endblock %}

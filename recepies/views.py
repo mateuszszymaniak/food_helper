@@ -29,14 +29,3 @@ def recepies_add(request):
     return render(
         request, "recepies/recepie_add.html", {"title": "Add Recepie", "form": form}
     )
-
-    """if request.method == "POST":
-        form = IngredientFormSet(request.POST)
-        if form.is_valid():
-            x = 5
-        pass
-    else:
-        form = CreateNewRecepie()
-        ingredient_formset = IngredientFormSet()
-    return render(request, "recepies/recepie_add.html", {'title': "Add Recepie", "form": form, "ingredient_formset": ingredient_formset})
-    """
