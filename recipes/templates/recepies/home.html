@@ -16,22 +16,22 @@
         <tbody>
         {% for recipe in recipes %}
             <tr>
-                <th scope="row">{{ recepie.id }}</th>
-                <td>{{ recepie.recepie_name }}</td>
-                <td>{{ recepie.ingredients }}</td>
-                <td>{{ recepie.preparation }}</td>
-                {% if recepie.tags %}
-                    <td>{{ recepie.tags }}</td>
+                <th scope="row">{{ recipe.id }}</th>
+                <td>{{ recipe.recipe_name }}</td>
+                <td>{{ recipe.ingredients }}</td>
+                <td>{{ recipe.preparation }}</td>
+                {% if recipe.tags %}
+                    <td>{{ recipe.tags }}</td>
                 {% else %}
                     <td></td>
                 {% endif %}
-                <td><a href="{% url 'recepie_edit' recepie.id %}" class="btn btn-primary" role="button">Edytuj</a></td>
+                <td><a href="{% url 'recipe_edit' recipe.id %}" class="btn btn-primary" role="button">Edytuj</a></td>
                 <td><button type="button" class="btn btn-danger" type="submit">Usuń</button></td>
             </tr>
         </tbody>
         {% endfor %}
     </table>
-    {{ recepie.ingredients }}
+    {{ recipe.ingredients }}
 {% else %}
     <p>Dodaj przepis</p>
 {% endif %}

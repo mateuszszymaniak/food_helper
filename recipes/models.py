@@ -5,8 +5,8 @@ from django.contrib.postgres.operations import HStoreExtension
 
 
 # Create your models here.
-class Recepie(models.Model):
-    recepie_name = models.CharField(max_length=100)
+class Recipe(models.Model):
+    recipe_name = models.CharField(max_length=100)
     ingredients = models.JSONField()
     preparation = models.TextField(blank=False, default="")
     tags = ArrayField(models.CharField(max_length=20, null=True), blank=True, null=True)

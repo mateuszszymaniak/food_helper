@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     operations = [
         HStoreExtension(),
         migrations.CreateModel(
-            name="Recepie",
+            name="Recipe",
             fields=[
                 (
                     "id",

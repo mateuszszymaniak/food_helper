@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="recepie",
+            model_name="recipe",
             name="preparation",
             field=models.TextField(blank=True),
         ),

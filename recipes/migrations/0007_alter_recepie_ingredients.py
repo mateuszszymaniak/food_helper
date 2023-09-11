@@ -5,12 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("recipes", "0006_rename_name_recepie_recepie_name"),
+        ("recipes", "0006_rename_name_recipe_recipe_name"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="recepie",
+            model_name="recipe",
             name="ingredients",
             field=models.JSONField(),
         ),

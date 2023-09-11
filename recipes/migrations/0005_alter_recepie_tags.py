@@ -6,12 +6,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("recipes", "0004_alter_recepie_preparation"),
+        ("recipes", "0004_alter_recipe_preparation"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="recepie",
+            model_name="recipe",
             name="tags",
             field=django.contrib.postgres.fields.ArrayField(
                 base_field=models.CharField(max_length=20, null=True),

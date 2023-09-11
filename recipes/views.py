@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CreateNewRecepie, RecepieIngredientsForm  # , IngredientFormSet
+from .forms import CreateNewRecipe, RecipeIngredientsForm  # , IngredientFormSet
 from django.contrib import messages
-from .models import Recepie
+from .models import Recipe
 from django.views.generic import UpdateView
 from django.contrib.auth.decorators import login_required
 
@@ -14,7 +14,7 @@ def recipes_home_page(request):
         "recipes/home.html",
         {
             "title": "Recipes",
-            "recipes": Recepie.objects.all().filter(user_fk=request.user.pk),
+            "recipes": Recipe.objects.all().filter(user_fk=request.user.pk),
         },
     )
 
@@ -22,15 +22,15 @@ def recipes_home_page(request):
 @login_required
 def recipes_add(request):
     if request.method == "POST":
-        form = RecepieIngredientsForm(request.POST)
+        form = RecipeIngredientsForm(request.POST)
         if form.is_valid():
-            recepie = form.save(commit=False)
-            recepie.user_fk = request.user.profile
-            recepie.save()
+            recipe = form.save(commit=False)
+            recipe.user_fk = request.user.profile
+            recipe.save()
             messages.success(request, "Przepis został dodany")
             return redirect("recipes_home_page")
     else:
-        form = RecepieIngredientsForm()
+        form = RecipeIngredientsForm()
     return render(
-        request, "recipes/recepie_form.html", {"title": "Add Recepie", "form": form}
+        request, "recipes/recipe_form.html", {"title": "Add Recipe", "form": form}
     )
