@@ -26,7 +26,7 @@ class RecepieIngredientsForm(forms.Form):
     def save(self, commit=True):
         recepie_name = self.data.get("recepie_name")
         preparation = self.data.get("preparation")
-        tags = list(self.data.get("tags"))
+        tags = self.data.get("tags")
         ingredients_amount = len(
             list(filter(lambda key: key.startswith("quantity-"), self.data.keys()))
         )
@@ -46,7 +46,7 @@ class RecepieIngredientsForm(forms.Form):
             recepie_name=recepie_name,
             ingredients=json.dumps(ingredients_json, indent=4, ensure_ascii=False),
             preparation=preparation,
-            tags=tags,
+            tags=[tags],
         )
 
         if commit:
