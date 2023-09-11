@@ -8,7 +8,7 @@
             {% csrf_token %}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Dodaj przepis!</legend>
-                {{ form.recepie_form.recepie_name|as_crispy_field }}
+                {{ form.recipe_form.recipe_name|as_crispy_field }}
                 Ingredient
                 <table id="ingredient-table">
                     <thead>
@@ -23,8 +23,8 @@
                     </tbody>
                 </table>
                 <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
-                {{ form.recepie_form.preparation|as_crispy_field }}
-                {{ form.recepie_form.tags|as_crispy_field }}
+                {{ form.recipe_form.preparation|as_crispy_field }}
+                {{ form.recipe_form.tags|as_crispy_field }}
             </fieldset>
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Dodaj</button>

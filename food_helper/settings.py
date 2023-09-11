@@ -36,7 +36,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "users.apps.UserConfig",
-    "recepies.apps.RecepiesConfig",
+    "recipes.apps.RecipesConfig",
     "fridges.apps.FridgesConfig",
     "crispy_forms",
     "crispy_bootstrap4",

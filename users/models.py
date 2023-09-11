@@ -6,4 +6,4 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # TODO add fk for recepie model and ingredient model
+    # TODO add fk for recipe model and ingredient model
