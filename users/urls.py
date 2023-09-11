@@ -22,5 +22,5 @@ urlpatterns = [
         MyResetPasswordView.as_view(template_name="users/reset_password.html"),
         name="reset_password_page",
     ),
-    path("recepie/", include("recepies.urls")),
+    path("recepie/", include("recipes.urls")),
 ]

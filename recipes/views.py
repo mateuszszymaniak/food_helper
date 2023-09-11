@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CreateNewRecepie, RecepieIngredientsForm  # , IngredientFormSet
 from django.contrib import messages
 from .models import Recepie
@@ -8,19 +8,19 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
-def recepies_home_page(request):
+def recipes_home_page(request):
     return render(
         request,
-        "recepies/home.html",
+        "recipes/home.html",
         {
-            "title": "Recepies",
-            "recepies": Recepie.objects.all().filter(user_fk=request.user.pk),
+            "title": "Recipes",
+            "recipes": Recepie.objects.all().filter(user_fk=request.user.pk),
         },
     )
 
 
 @login_required
-def recepies_add(request):
+def recipes_add(request):
     if request.method == "POST":
         form = RecepieIngredientsForm(request.POST)
         if form.is_valid():
@@ -28,9 +28,9 @@ def recepies_add(request):
             recepie.user_fk = request.user.profile
             recepie.save()
             messages.success(request, "Przepis został dodany")
-            return redirect("recepies_home_page")
+            return redirect("recipes_home_page")
     else:
         form = RecepieIngredientsForm()
     return render(
-        request, "recepies/recepie_form.html", {"title": "Add Recepie", "form": form}
+        request, "recipes/recepie_form.html", {"title": "Add Recepie", "form": form}
     )

@@ -1,11 +1,9 @@
 {% extends 'users/base.html' %}
 {% block content %}
 <p>Strona domowa przepisów</p>
-    <a href="{% url 'recepies_add' %}" class="btn btn-primary" role="button">Dodaj</a>
-    <button type="button" class="btn btn-primary" type="submit">Edytuj</button>
-    <button type="button" class="btn btn-danger" type="submit">Usuń</button>
-{% if recepies %}
-    <table id="recepies-table">
+    <a href="{% url 'recipes_add' %}" class="btn btn-primary" role="button">Dodaj</a>
+{% if recipes %}
+    <table id="recipes-table">
         <thead>
             <tr>
                 <th scope="col">Nr.</th>
@@ -16,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for recepie in recepies %}
+        {% for recipe in recipes %}
             <tr>
                 <th scope="row">{{ recepie.id }}</th>
                 <td>{{ recepie.recepie_name }}</td>
@@ -24,7 +22,11 @@
                 <td>{{ recepie.preparation }}</td>
                 {% if recepie.tags %}
                     <td>{{ recepie.tags }}</td>
+                {% else %}
+                    <td></td>
                 {% endif %}
+                <td><a href="{% url 'recepie_edit' recepie.id %}" class="btn btn-primary" role="button">Edytuj</a></td>
+                <td><button type="button" class="btn btn-danger" type="submit">Usuń</button></td>
             </tr>
         </tbody>
         {% endfor %}
