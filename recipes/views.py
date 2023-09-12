@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
 from django.views import View
 
 from .forms import RecipeIngredientsForm
@@ -24,9 +25,18 @@ class RecipesHomePageView(View):
         return render(request, self.template_name, context)
 
 
-@login_required
-def recipes_add(request):
-    if request.method == "POST":
+class RecipeAddPageView(View):
+    template_name = "recipes/recipe_form.html"
+
+    @method_decorator(login_required)
+    def get(self, request):
+        form = RecipeIngredientsForm()
+        context = {"title": "Add Recipe", "form": form}
+
+        return render(request, self.template_name, context)
+
+    @method_decorator(login_required)
+    def post(self, request):
         form = RecipeIngredientsForm(request.POST)
         if form.is_valid():
             recipe = form.save(commit=False)
@@ -34,8 +44,3 @@ def recipes_add(request):
             recipe.save()
             messages.success(request, "Przepis został dodany")
             return redirect("recipes_home_page")
-    else:
-        form = RecipeIngredientsForm()
-    return render(
-        request, "recipes/recipe_form.html", {"title": "Add Recipe", "form": form}
-    )
