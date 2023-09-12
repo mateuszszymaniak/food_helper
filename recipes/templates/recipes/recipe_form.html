@@ -33,18 +33,18 @@
     </div>
     <script>
     function add_ingredient(){
-        const rowNumber = document.getElementById('ingredient-table').rows.length;
+        const ingredientNumber = document.getElementById('ingredient-table').rows.length - 1;
         const table = document.getElementById('ingredient-table');
         const newRow = document.createElement("tr");
 
         const newQuantityInput = document.createElement("td");
-        newQuantityInput.innerHTML = `<input type="text" name="quantity-${rowNumber}" maxlength="15" class="textinput form-control" required="" id="id_quantity">`
+        newQuantityInput.innerHTML = `<input type="text" name="quantity-${ingredientNumber}" maxlength="15" class="textinput form-control" required="" id="id_quantity">`
 
         const newNameInput = document.createElement("td");
-        newNameInput.innerHTML = `<input type="text" name="name-${rowNumber}" maxlength="50" class="textinput form-control" required="" id="id_name">`
+        newNameInput.innerHTML = `<input type="text" name="name-${ingredientNumber}" maxlength="50" class="textinput form-control" required="" id="id_name">`
 
         const deleteCell = document.createElement("td");
-        deleteCell.innerHTML = `<button type="button" name="delete-${rowNumber}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+        deleteCell.innerHTML = `<button type="button" name="delete-${ingredientNumber}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
 
         newRow.appendChild(newQuantityInput);
         newRow.appendChild(newNameInput);
