@@ -1,22 +1,27 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CreateNewRecipe, RecipeIngredientsForm  # , IngredientFormSet
 from django.contrib import messages
-from .models import Recipe
-from django.views.generic import UpdateView
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+from django.views import View
 
-# Create your views here.
+from .forms import RecipeIngredientsForm
+from .models import Recipe
 
 
 def recipes_home_page(request):
-    return render(
-        request,
-        "recipes/home.html",
-        {
-            "title": "Recipes",
-            "recipes": Recipe.objects.all().filter(user_fk=request.user.pk),
-        },
-    )
+    user_recipes = Recipe.objects.all().filter(user_fk=request.user.pk)
+    context = {"title": "Recipes", "recipes": user_recipes}
+
+    return render(request, "recipes/home.html", context)
+
+
+class RecipesHomePageView(View):
+    template_name = "recipes/home.html"
+
+    def get(self, request):
+        user_recipes = Recipe.objects.all().filter(user_fk=request.user.pk)
+        context = {"title": "Recipes", "recipes": user_recipes}
+
+        return render(request, self.template_name, context)
 
 
 @login_required

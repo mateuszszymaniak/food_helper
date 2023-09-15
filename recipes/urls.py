@@ -1,7 +1,9 @@
-from django.urls import path, include
+from django.urls import include, path
+
 from . import views
+from .views import RecipesHomePageView
 
 urlpatterns = [
-    path("", views.recipes_home_page, name="recipes_home_page"),
+    path("", RecipesHomePageView.as_view(), name="recipes_home_page"),
     path("add/", views.recipes_add, name="recipes_add"),
 ]

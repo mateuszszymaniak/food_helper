@@ -122,9 +122,9 @@ celerybeat.pid
 # Environments
 .env
 .venv
-env/
+food_helper/env.py/
 venv/
-ENV/
+food_helper/env.py/
 env.bak/
 venv.bak/
 
