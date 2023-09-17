@@ -30,7 +30,7 @@
                     <td></td>
                 {% endif %}
                 <td><a href="{% url 'recipe_edit' recipe.id %}" class="btn btn-primary" role="button">Edytuj</a></td>
-                <td><button type="button" class="btn btn-danger" type="submit">Usuń</button></td>
+                <td><a href="{% url 'recipe_delete' recipe.id %}" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć przepis?')" role="button">Usuń</a></td>
             </tr>
         </tbody>
         {% endfor %}
