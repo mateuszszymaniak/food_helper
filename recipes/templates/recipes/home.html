@@ -18,10 +18,14 @@
             <tr>
                 <th scope="row">{{ recipe.id }}</th>
                 <td>{{ recipe.recipe_name }}</td>
-                <td>{{ recipe.ingredients }}</td>
+                <td>
+                {% for ingredients in recipe.ingredients %}
+                    <li>{{ ingredients.quantity }} {{ ingredients.quantity_type }} {{ ingredients.name }}</li>
+                {% endfor %}
+                </td>
                 <td>{{ recipe.preparation }}</td>
                 {% if recipe.tags %}
-                    <td>{{ recipe.tags }}</td>
+                    <td>{% for tag in recipe.tags %}{{ tag }}{% endfor %}</td>
                 {% else %}
                     <td></td>
                 {% endif %}

@@ -6,6 +6,66 @@
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
+            {% if form.id %}
+            <p>Test edycji z 1 szablonu</p>
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Edytuj przepis!</legend>
+
+                <div id="div_id_recipe_name" class="form-group">
+                    <label for="id_recipe_name" class=" requiredField">Recipe name<span class="asteriskField">*</span></label>
+                    <div>
+                        <input type="text" name="recipe_name" maxlength="100" class="textinput form-control" required="" id="id_recipe_name" value="{{ form.recipe_name }}">
+                    </div>
+                </div>
+
+                Ingredient
+                <table id="ingredient-table">
+                    <thead>
+                        <tr>
+                            <td>Quantity</td>
+                            <td>Quantity type</td>
+                            <td>Name</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for ingredient in ingredient_form %}
+                        <tr id="">
+                            <td><input type="text" name="quantity-{{ forloop.counter0 }}" maxlength="15" class="textinput form-control" required="" id="id_quantity" value="{{ ingredient.quantity }}"></td>
+                            <td><select name="quantity_type-{{ forloop.counter0 }}" class="select form-control" id="id_quantity_type">
+                                <option value="kg" {% if ingredient.quantity_type == 'kg' %} selected {% endif %}>kg</option>
+                                <option value="g" {% if ingredient.quantity_type == 'g' %} selected {% endif %}>g</option>
+                                <option value="l" {% if ingredient.quantity_type == 'l' %} selected {% endif %}>l</option>
+                                <option value="ml" {% if ingredient.quantity_type == 'ml' %} selected {% endif %}>ml</option>
+                                <option value="szt." {% if ingredient.quantity_type == 'szt.' %} selected {% endif %}>szt.</option>
+                                <option value="opak." {% if ingredient.quantity_type == 'opak.' %} selected {% endif %}>opak.</option></select></td>
+                            <td><input type="text" name="name-{{ forloop.counter0 }}" maxlength="50" class="textinput form-control" required="" id="id_name" value="{{ ingredient.name }}"></td>
+                            <td><button type="button" name="delete-{{ forloop.counter0 }}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button></td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
+
+                <div id="div_id_preparation" class="form-group">
+                    <label for="id_preparation" class=" requiredField">Preparation<span class="asteriskField">*</span></label>
+                    <div>
+                        <textarea name="preparation" cols="40" rows="10" class="textarea form-control" required="" id="id_preparation">{{ form.preparation }}</textarea>
+                    </div>
+                </div>
+
+                <div id="div_id_tags" class="form-group">
+                    <label for="id_tags" class="">Tags</label>
+                    <div>
+                        <input type="text" name="tags" class="textinput form-control" id="id_tags" value="{% for tag in form.tags %}{{ tag }}{% endfor %}">
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Zapisz zmiany</button>
+            </div>
+            {% else %}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Dodaj przepis!</legend>
                 {{ form.recipe_form.recipe_name|as_crispy_field }}
@@ -14,6 +74,7 @@
                     <thead>
                         <tr>
                             <td>Quantity</td>
+                            <td>Quantity type</td>
                             <td>Name</td>
                             <td></td>
                         </tr>
@@ -29,24 +90,29 @@
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Dodaj</button>
             </div>
+            {% endif %}
         </form>
     </div>
     <script>
     function add_ingredient(){
-        const rowNumber = document.getElementById('ingredient-table').rows.length;
+        const ingredientNumber = document.getElementById('ingredient-table').rows.length - 1;
         const table = document.getElementById('ingredient-table');
         const newRow = document.createElement("tr");
 
         const newQuantityInput = document.createElement("td");
-        newQuantityInput.innerHTML = `<input type="text" name="quantity-${rowNumber}" maxlength="15" class="textinput form-control" required="" id="id_quantity">`
+        newQuantityInput.innerHTML = `<input type="text" name="quantity-${ingredientNumber}" maxlength="15" class="textinput form-control" required id="id_quantity">`
+
+        const newQuantityTypeChoice = document.createElement("td");
+        newQuantityTypeChoice.innerHTML = `<select name="quantity_type-${ingredientNumber}" class="select form-control" id="id_quantity_type"> <option value="kg">kg</option> <option value="g">g</option> <option value="l">l</option> <option value="ml">ml</option> <option value="szt.">szt.</option> <option value="opak.">opak.</option></select>`;
 
         const newNameInput = document.createElement("td");
-        newNameInput.innerHTML = `<input type="text" name="name-${rowNumber}" maxlength="50" class="textinput form-control" required="" id="id_name">`
+        newNameInput.innerHTML = `<input type="text" name="name-${ingredientNumber}" maxlength="50" class="textinput form-control" required id="id_name">`
 
         const deleteCell = document.createElement("td");
-        deleteCell.innerHTML = `<button type="button" name="delete-${rowNumber}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+        deleteCell.innerHTML = `<button type="button" name="delete-${ingredientNumber}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
 
         newRow.appendChild(newQuantityInput);
+        newRow.appendChild(newQuantityTypeChoice);
         newRow.appendChild(newNameInput);
         newRow.appendChild(deleteCell);
         table.appendChild(newRow);
