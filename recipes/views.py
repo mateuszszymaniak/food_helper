@@ -199,3 +199,14 @@ class RecipeEditPageView(View):
         if tags_from_recipe != tags_from_form:
             changes["tags"] = (tags_from_recipe, tags_from_form)
         return changes
+
+
+class RecipeDeletePageView(View):
+    def get(self, request, recipe_id):
+        self.post(request, recipe_id)
+        messages.success(request, "Pomyślnie usunięto przepis")
+        return redirect("recipes_home_page")
+
+    def post(self, request, recipe_id):
+        recipe = get_object_or_404(Recipe, pk=recipe_id)
+        recipe.delete()
