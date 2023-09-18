@@ -1,5 +1,3 @@
-import json
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -7,15 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from .forms import CreateNewRecipe, IngredientsForm, RecipeIngredientsForm
+from .forms import RecipeIngredientsForm
 from .models import Ingredient, Recipe, RecipeIngredient
-
-
-def recipes_home_page(request):
-    user_recipes = Recipe.objects.all().filter(user=request.user.pk)
-    context = {"title": "Recipes", "recipes": user_recipes}
-
-    return render(request, "recipes/home.html", context)
 
 
 class RecipesHomePageView(View):
