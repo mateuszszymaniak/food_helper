@@ -58,7 +58,7 @@ class RecipeAddPageView(View):
             recipe.save()
             self.add_ingredients_to_recipe(request.POST, recipe)
             messages.success(request, "Przepis został dodany")
-            return redirect("recipes_home_page")
+            return redirect("recipes-home-page")
 
     def add_ingredients_to_recipe(self, request, recipe):
         ingredients_list = list(
@@ -98,7 +98,7 @@ class RecipeEditPageView(View):
                     setattr(recipe, field, new_value)
             recipe.save()
             messages.success(request, "Przepis został zaktualizowany")
-            return redirect("recipes_home_page")
+            return redirect("recipes-home-page")
 
     def ingredients_change(self, recipe, form):
         ingredients_list = list(
@@ -196,7 +196,7 @@ class RecipeDeletePageView(View):
     def get(self, request, recipe_id):
         self.post(request, recipe_id)
         messages.success(request, "Pomyślnie usunięto przepis")
-        return redirect("recipes_home_page")
+        return redirect("recipes-home-page")
 
     def post(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, pk=recipe_id)

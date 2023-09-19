@@ -8,10 +8,16 @@ from .views import (
 )
 
 urlpatterns = [
-    path("", RecipesHomePageView.as_view(), name="recipes_home_page"),
-    path("add/", RecipeAddPageView.as_view(), name="recipes_add"),
-    path("edit/<int:recipe_id>/", RecipeEditPageView.as_view(), name="recipe_edit"),
+    path("recipes/", RecipesHomePageView.as_view(), name="recipes-home-page"),
+    path("recipes/add/", RecipeAddPageView.as_view(), name="recipe-add"),
     path(
-        "delete/<int:recipe_id>/", RecipeDeletePageView.as_view(), name="recipe_delete"
+        "recipes/<int:recipe_id>/edit/",
+        RecipeEditPageView.as_view(),
+        name="recipe-edit",
+    ),
+    path(
+        "recipes/<int:recipe_id>/delete/",
+        RecipeDeletePageView.as_view(),
+        name="recipe-delete",
     ),
 ]

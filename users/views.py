@@ -19,7 +19,7 @@ class CustomAuthForm(AuthenticationForm):
 
 class MyResetPasswordView(PasswordResetView):
     form_class = MyResetPasswordForm
-    success_url = reverse_lazy("login_page")
+    success_url = reverse_lazy("login-page")
 
     def form_valid(self, form):
         email = form.data.get("email")
@@ -30,17 +30,17 @@ class MyResetPasswordView(PasswordResetView):
             user = get_user_model().objects.get(email=email)
         except get_user_model().DoesNotExist:
             messages.warning(self.request, "Email does not exist")
-            return redirect("reset_password_page")
+            return redirect("reset-password-page")
 
         if new_password == confirm_new_password:
             user.set_password(new_password)
             user.save()
             messages.success(self.request, "Password successfully reset.")
-            return redirect("login_page")
+            return redirect("login-page")
             # return super().form_valid(form) TODO fix later
         else:
             messages.error(self.request, "Passwords are not the same")
-            return redirect("reset_password_page")
+            return redirect("reset-password-page")
 
     def form_invalid(self, form):
         messages.error(self.request, "Invalid form submission")
@@ -59,7 +59,7 @@ class MyLoginView(LoginView):
                 Profile.objects.filter(user=user_exist).update(
                     failed_login_date=datetime.now()
                 )
-        return redirect("login_page")
+        return redirect("login-page")
 
 
 class HomePageView(View):
@@ -84,10 +84,10 @@ class RegisterView(View):
         if form.is_valid():
             form.save()
             messages.success(request, "User created correctly")
-            return redirect("login_page")
+            return redirect("login-page")
         else:
             messages.warning(request, "Form have invalid data")
-            return redirect("register_page")
+            return redirect("register-page")
 
 
 class ResetPasswordView(View):
@@ -104,10 +104,10 @@ class ResetPasswordView(View):
         if form.is_valid():
             form.save()
             messages.success(request, "Password successfully reseted")
-            return redirect("login_page")
+            return redirect("login-page")
         else:
             messages.warning(request, "Form have invalid data")
-            return redirect("reset_password_page")
+            return redirect("reset-password-page")
 
 
 class ProfileView(View):
