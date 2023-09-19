@@ -1,16 +1,16 @@
-from django.shortcuts import render, redirect
-from .forms import UserRegisterForm, MyResetPasswordForm
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Profile
-from django.contrib.auth.views import LoginView, AuthenticationForm, PasswordResetView
 from datetime import datetime
-from django.contrib.auth.hashers import make_password
-from django.urls import reverse_lazy
-from django.forms import ValidationError
 
-# Create your views here.
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View
+
+from .forms import MyResetPasswordForm, UserRegisterForm
+from .models import Profile
 
 
 class CustomAuthForm(AuthenticationForm):
@@ -19,25 +19,32 @@ class CustomAuthForm(AuthenticationForm):
 
 class MyResetPasswordView(PasswordResetView):
     form_class = MyResetPasswordForm
+    success_url = reverse_lazy("login_page")
 
     def form_valid(self, form):
-        if self.request.method == "POST":
-            try:
-                email_exist = User.objects.get(email=form.data.get("email"))
-                same_password = form.data.get("new_password") == form.data.get(
-                    "confirm_new_password"
-                )
-            except Exception:
-                messages.warning(self.request, "Email does not exist")
-                return redirect("reset_password_page")
-            if email_exist and same_password:
-                User.objects.filter(email=form.data.get("email")).update(
-                    password=make_password(form.data.get("new_password"))
-                )
-                return redirect("login_page")
-            else:
-                messages.error(self.request, "Passwords are not the same")
-                return redirect("reset_password_page")
+        email = form.data.get("email")
+        new_password = form.data.get("new_password")
+        confirm_new_password = form.data.get("confirm_new_password")
+
+        try:
+            user = get_user_model().objects.get(email=email)
+        except get_user_model().DoesNotExist:
+            messages.warning(self.request, "Email does not exist")
+            return redirect("reset_password_page")
+
+        if new_password == confirm_new_password:
+            user.set_password(new_password)
+            user.save()
+            messages.success(self.request, "Password successfully reset.")
+            return redirect("login_page")
+            # return super().form_valid(form) TODO fix later
+        else:
+            messages.error(self.request, "Passwords are not the same")
+            return redirect("reset_password_page")
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Invalid form submission")
+        return super().form_invalid(form)
 
 
 class MyLoginView(LoginView):
@@ -46,10 +53,8 @@ class MyLoginView(LoginView):
 
     def form_invalid(self, form):
         if self.request.method == "POST":
-            try:
-                user_exist = User.objects.get(username=form.data.get("username"))
-            except Exception:
-                user_exist = False
+            username = form.data.get("username")
+            user_exist = get_user_model().objects.filter(username=username).exists()
             if user_exist:
                 Profile.objects.filter(user=user_exist).update(
                     failed_login_date=datetime.now()
@@ -57,36 +62,58 @@ class MyLoginView(LoginView):
         return redirect("login_page")
 
 
-def home(request):
-    return render(request, "users/home.html", {"title": "Home Page"})
+class HomePageView(View):
+    template_name = "users/home.html"
+    context = {"title": "Home Page"}
+
+    def get(self, request):
+        return render(request, self.template_name, self.context)
 
 
-def register(request):
-    if request.method == "POST":
+class RegisterView(View):
+    template_name = "users/register.html"
+    form = UserRegisterForm()
+    context = {"title": "Register", "form": form}
+
+    def get(self, request):
+        return render(request, self.template_name, self.context)
+
+    @staticmethod
+    def post(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "User created correctly")
             return redirect("login_page")
-    else:
-        form = UserRegisterForm()
-    return render(request, "users/register.html", {"title": "Register", "form": form})
+        else:
+            messages.warning(request, "Form have invalid data")
+            return redirect("register_page")
 
 
-def reset_password(request):
-    if request.method == "POST":
+class ResetPasswordView(View):
+    template_name = "users/reset_password.html"
+    form = MyResetPasswordForm()
+    context = {"title": "Reset Password", "form": form}
+
+    def get(self, request):
+        return render(request, self.template_name, self.context)
+
+    @staticmethod
+    def post(request):
         form = MyResetPasswordForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Password successfully reseted")
             return redirect("login_page")
-    else:
-        form = MyResetPasswordForm()
-    return render(
-        request, "users/reset_password.html", {"title": "Reset Password", "form": form}
-    )
+        else:
+            messages.warning(request, "Form have invalid data")
+            return redirect("reset_password_page")
 
 
-@login_required
-def profile(request):
-    return render(request, "users/profile.html", {"title": "Profile"})
+class ProfileView(View):
+    template_name = "users/profile.html"
+    context = {"title": "Profile"}
+
+    @method_decorator(login_required)
+    def get(self, request):
+        return render(request, self.template_name, self.context)
