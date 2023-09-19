@@ -1,26 +1,31 @@
-from django.urls import path, include
-from . import views
 from django.contrib.auth import views as auth_views
-from .views import MyLoginView, MyResetPasswordView
+from django.urls import path
+
+from .views import (
+    HomePageView,
+    MyLoginView,
+    MyResetPasswordView,
+    ProfileView,
+    RegisterView,
+)
 
 urlpatterns = [
-    path("", views.home, name="home_page"),
-    path("register/", views.register, name="register_page"),
+    path("", HomePageView.as_view(), name="home-page"),
+    path("register/", RegisterView.as_view(), name="register-page"),
     path(
         "login/",
         MyLoginView.as_view(template_name="users/login.html"),
-        name="login_page",
+        name="login-page",
     ),
-    path("profile/", views.profile, name="profile_page"),
+    path("profile/", ProfileView.as_view(), name="profile-page"),
     path(
         "logout/",
         auth_views.LogoutView.as_view(template_name="users/logout.html"),
-        name="logout_page",
+        name="logout-page",
     ),
     path(
         "reset_password/",
         MyResetPasswordView.as_view(template_name="users/reset_password.html"),
-        name="reset_password_page",
+        name="reset-password-page",
     ),
-    path("recipe/", include("recipes.urls")),
 ]

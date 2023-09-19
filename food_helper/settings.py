@@ -35,8 +35,6 @@ DEBUG = env("DEBUG")
 ALLOWED_HOSTS = []
 
 
-# Application definition
-
 INSTALLED_APPS = [
     "users.apps.UserConfig",
     "recipes.apps.RecipesConfig",
@@ -140,6 +138,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
-LOGIN_REDIRECT_URL = "profile_page"
+LOGIN_REDIRECT_URL = "profile-page"
 
-LOGIN_URL = "login_page"
+LOGIN_URL = "login-page"
