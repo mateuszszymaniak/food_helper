@@ -94,28 +94,30 @@
         </form>
     </div>
     <script>
+        let number = 0;
     function add_ingredient(){
-        const ingredientNumber = document.getElementById('ingredient-table').rows.length - 1;
         const table = document.getElementById('ingredient-table');
         const newRow = document.createElement("tr");
 
         const newQuantityInput = document.createElement("td");
-        newQuantityInput.innerHTML = `<input type="text" name="quantity-${ingredientNumber}" maxlength="15" class="textinput form-control" required id="id_quantity">`
+        newQuantityInput.innerHTML = `<input type="text" name="quantity-${number}" maxlength="15" class="textinput form-control" required id="id_quantity">`
 
         const newQuantityTypeChoice = document.createElement("td");
-        newQuantityTypeChoice.innerHTML = `<select name="quantity_type-${ingredientNumber}" class="select form-control" id="id_quantity_type"> <option value="kg">kg</option> <option value="g">g</option> <option value="l">l</option> <option value="ml">ml</option> <option value="szt.">szt.</option> <option value="opak.">opak.</option></select>`;
+        newQuantityTypeChoice.innerHTML = `<select name="quantity_type-${number}" class="select form-control" id="id_quantity_type"> <option value="kg">kg</option> <option value="g">g</option> <option value="l">l</option> <option value="ml">ml</option> <option value="szt.">szt.</option> <option value="opak.">opak.</option></select>`;
 
         const newNameInput = document.createElement("td");
-        newNameInput.innerHTML = `<input type="text" name="name-${ingredientNumber}" maxlength="50" class="textinput form-control" required id="id_name">`
+        newNameInput.innerHTML = `<input type="text" name="name-${number}" maxlength="50" class="textinput form-control" required id="id_name">`
 
         const deleteCell = document.createElement("td");
-        deleteCell.innerHTML = `<button type="button" name="delete-${ingredientNumber}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+        deleteCell.innerHTML = `<button type="button" name="delete-${number}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
 
         newRow.appendChild(newQuantityInput);
         newRow.appendChild(newQuantityTypeChoice);
         newRow.appendChild(newNameInput);
         newRow.appendChild(deleteCell);
         table.appendChild(newRow);
+
+        number += 1;
     }
 
     function delete_ingredient(button){
