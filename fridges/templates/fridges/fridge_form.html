@@ -1,0 +1,97 @@
+{% extends 'users/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<p>Tutaj powinien być formularz dodawania zawartości lodówki</p>
+
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            {% if ingredient.id %}
+            <p>Test edycji z 1 szablonu</p>
+                <table id="ingredient-table">
+                    <thead>
+                        <tr>
+                            <td>Quantity</td>
+                            <td>Quantity type</td>
+                            <td>Name</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="">
+                            <td><input type="text" name="quantity-0" maxlength="15" class="textinput form-control" required="" id="id_quantity" value="{{ ingredient.quantity }}"></td>
+                            <td><select name="quantity_type-0" class="select form-control" id="id_quantity_type">
+                                <option value="kg" {% if ingredient.quantity_type == 'kg' %} selected {% endif %}>kg</option>
+                                <option value="g" {% if ingredient.quantity_type == 'g' %} selected {% endif %}>g</option>
+                                <option value="l" {% if ingredient.quantity_type == 'l' %} selected {% endif %}>l</option>
+                                <option value="ml" {% if ingredient.quantity_type == 'ml' %} selected {% endif %}>ml</option>
+                                <option value="szt." {% if ingredient.quantity_type == 'szt.' %} selected {% endif %}>szt.</option>
+                                <option value="opak." {% if ingredient.quantity_type == 'opak.' %} selected {% endif %}>opak.</option></select></td>
+                            <td><input type="text" name="name-0" maxlength="50" class="textinput form-control" required="" id="id_name" value="{{ ingredient.name }}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">Zapisz zmiany</button>
+                </div>
+            {% else %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Dodaj składnik!</legend>
+                Ingredient
+                <table id="ingredient-table">
+                    <thead>
+                        <tr>
+                            <td>Quantity</td>
+                            <td>Quantity type</td>
+                            <td>Name</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Dodaj</button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+    <script>
+        let number = 0;
+    function add_ingredient(){
+        const table = document.getElementById('ingredient-table');
+        const newRow = document.createElement("tr");
+
+        const newQuantityInput = document.createElement("td");
+        newQuantityInput.innerHTML = `<input type="text" name="quantity-${number}" maxlength="15" class="textinput form-control" required id="id_quantity">`
+
+        const newQuantityTypeChoice = document.createElement("td");
+        newQuantityTypeChoice.innerHTML = `<select name="quantity_type-${number}" class="select form-control" id="id_quantity_type"> <option value="kg">kg</option> <option value="g">g</option> <option value="l">l</option> <option value="ml">ml</option> <option value="szt.">szt.</option> <option value="opak.">opak.</option></select>`;
+
+        const newNameInput = document.createElement("td");
+        newNameInput.innerHTML = `<input type="text" name="name-${number}" maxlength="50" class="textinput form-control" required id="id_name">`
+
+        const deleteCell = document.createElement("td");
+        deleteCell.innerHTML = `<button type="button" name="delete-${number}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+
+        newRow.appendChild(newQuantityInput);
+        newRow.appendChild(newQuantityTypeChoice);
+        newRow.appendChild(newNameInput);
+        newRow.appendChild(deleteCell);
+        table.appendChild(newRow);
+
+        number += 1;
+    }
+
+    function delete_ingredient(button){
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+
+    }
+
+    </script>
+
+{% endblock %}

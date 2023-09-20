@@ -1,0 +1,31 @@
+{% extends 'users/base.html' %}
+{% block content %}
+<p>Strona domowa 'lodówki'</p>
+    <a href="{% url 'fridge-add' %}" class="btn btn-primary" role="button">Dodaj</a>
+{% if fridge %}
+    <table id="recipes-table">
+        <thead>
+            <tr>
+                <th scope="col">Nr.</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Quantity Type</th>
+                <th scope="col">Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ingredient in fridge %}
+            <tr>
+                <th scope="row">{{ ingredient.id }}</th>
+                <td>{{ ingredient.quantity }}</td>
+                <td>{{ ingredient.quantity_type }}</td>
+                <td>{{ ingredient.name }}</td>
+                <td><a href="{% url 'fridge-edit' ingredient.id %}" class="btn btn-primary" role="button">Edytuj</a></td>
+                <td><a href="{% url 'fridge-delete' ingredient.id %}" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" role="button">Usuń</a></td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>Dodaj zawartość lodówki</p>
+{% endif %}
+{% endblock %}
