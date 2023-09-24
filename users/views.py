@@ -9,6 +9,9 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 
+from fridges.models import Fridge
+from recipes.models import Ingredient, Recipe
+
 from .forms import MyResetPasswordForm, UserRegisterForm
 from .models import Profile
 
@@ -67,7 +70,54 @@ class HomePageView(View):
     context = {"title": "Home Page"}
 
     def get(self, request):
-        return render(request, self.template_name, self.context)
+        if request.user:
+            user_fridge = Fridge.objects.all().filter(user=request.user.pk)
+            user_recipes = Recipe.objects.all().filter(user=request.user.pk)
+            fridge = self.get_fridge_ingredients(user_fridge)
+            ready_recipes, sorted_keys = self.ready_recipes(user_recipes, fridge)
+            self.context["ready_recipes"] = ready_recipes
+            self.context["sorted_keys"] = sorted_keys
+            return render(request, self.template_name, self.context)
+        else:
+            return render(request, self.template_name, self.context)
+
+    def get_recipe_ingredients(self, recipe):
+        ingredients = []
+        for ingredient in recipe.ingredients.all():
+            ingredients.append(ingredient)
+        return ingredients
+
+    def get_fridge_ingredients(self, user_fridge):
+        fridge = []
+        for ingredient in user_fridge:
+            fridge.append(ingredient)
+        return fridge
+
+    def ready_recipes(self, user_recipes, fridge):
+        result_recipes = {}
+
+        for recipe in user_recipes:
+            ingredients = self.get_recipe_ingredients(recipe)
+            missing_ingredients_counter = 0
+            for ingredient_item in ingredients:
+                ingredient_name = ingredient_item.name
+                ingredient_quantity = int(ingredient_item.quantity)
+                ingredient_found = False
+                for fridge_item in fridge:
+                    if (
+                        ingredient_name == fridge_item.name
+                        and ingredient_quantity < int(fridge_item.quantity)
+                    ):
+                        ingredient_found = True
+                        break
+                if not ingredient_found:
+                    missing_ingredients_counter += 1
+            if str(missing_ingredients_counter) in result_recipes:
+                result_recipes[str(missing_ingredients_counter)].append(recipe)
+            else:
+                result_recipes[str(missing_ingredients_counter)] = [recipe]
+        sorted_keys = sorted(result_recipes.keys())
+        return result_recipes, sorted_keys
 
 
 class RegisterView(View):
