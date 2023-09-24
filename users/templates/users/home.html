@@ -1,1 +1,46 @@
 {% extends 'users/base.html' %}
+{% load custom_filters %}
+{% block content %}
+{% if user.is_authenticated %}
+    <table>
+    <tbody>
+    {% for key in sorted_keys %}
+        {% if key == '0' %}
+            <tr>
+                <td colspan="4">Przepisy, które można zrobić</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">Brakujące składniki w przepisach: {{ key }}</td>
+            </tr>
+        {% endif %}
+        <tr>
+            <td>Nazwa</td>
+            <td>Składniki</td>
+            <td>Przygotowanie</td>
+            <td>Tagi</td>
+        </tr>
+        {% for recipe in ready_recipes|get_item:key %}
+            <tr>
+                <td>{{ recipe.recipe_name }}</td>
+                <td>
+                {% for ingredients in recipe.ingredients.all %}
+                    <li>{{ ingredients.quantity }} {{ ingredients.quantity_type }} {{ ingredients.name }}</li>
+                {% endfor %}
+                </td>
+                <td>{{ recipe.preparation }}</td>
+                {% if recipe.tags %}
+                    <td>{% for tag in recipe.tags %}{{ tag }}{% endfor %}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td colspan="4"></td>
+            </tr>
+        {% endfor %}
+    {% endfor %}
+    </tbody>
+    </table>
+{% endif %}
+{% endblock %}

@@ -33,6 +33,7 @@
                         <a class="nav-item nav-link" href="{% url 'home-page' %}">Home</a>
                         {% if user.is_authenticated %}
                             <a class="nav-item nav-link" href="{% url 'recipes-home-page' %}">Przepisy</a>
+                            <a class="nav-item nav-link" href="{% url 'fridges-home-page' %}">Lodówka</a>
                         {% endif %}
                     </div>
                     <!-- Navbar Right Side -->
