@@ -1,19 +1,20 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.decorators import method_decorator
+from django.urls import reverse_lazy
 from django.views import View
+from django.views.generic import DeleteView
 
 from .forms import RecipeIngredientsForm
 from .models import Ingredient, Recipe, RecipeIngredient
 
 
-class RecipesHomePageView(View):
+class RecipesHomePageView(LoginRequiredMixin, View):
     template_name = "recipes/home.html"
 
     def get(self, request):
-        user_recipes = Recipe.objects.all().filter(user=request.user.pk).order_by("id")
+        user_recipes = Recipe.objects.filter(user=request.user.pk).order_by("id")
         recipes_with_ingredients = []
         for recipe in user_recipes:
             recipe_data = {
@@ -34,22 +35,22 @@ class RecipesHomePageView(View):
                 }
                 recipe_data["ingredients"].append(ingredient_data)
             recipes_with_ingredients.append(recipe_data)
-        context = {"title": "Recipes", "recipes": recipes_with_ingredients}
-
+        context = {
+            "title": "Recipes",
+            "recipes": recipes_with_ingredients,
+        }
         return render(request, self.template_name, context)
 
 
-class RecipeAddPageView(View):
+class RecipeAddPageView(LoginRequiredMixin, View):
     template_name = "recipes/recipe_form.html"
 
-    @method_decorator(login_required)
     def get(self, request):
         form = RecipeIngredientsForm()
         context = {"title": "Add Recipe", "form": form}
 
         return render(request, self.template_name, context)
 
-    @method_decorator(login_required)
     def post(self, request):
         form = RecipeIngredientsForm(request.POST)
         if form.is_valid():
@@ -60,16 +61,12 @@ class RecipeAddPageView(View):
             messages.success(request, "Przepis został dodany")
             return redirect("recipes-home-page")
 
-    def add_ingredients_to_recipe(self, request, recipe):
-        ingredients_list = list(
-            filter(lambda key: key.startswith("quantity-"), request)
-        )
+    def add_ingredients_to_recipe(self, data, recipe):
+        ingredients_list = list(filter(lambda key: key.startswith("quantity-"), data))
         for prefix in ingredients_list:
-            quantity = request.get(prefix)
-            name = request.get(f"{prefix.replace('quantity', 'name')}")
-            quantity_type = request.get(
-                f"{prefix.replace('quantity', 'quantity_type')}"
-            )
+            quantity = data.get(prefix)
+            name = data.get(f"{prefix.replace('quantity', 'name')}")
+            quantity_type = data.get(f"{prefix.replace('quantity', 'quantity_type')}")
 
             ingredient = Ingredient.objects.get_or_create(
                 name=name, quantity=quantity, quantity_type=quantity_type
@@ -77,7 +74,7 @@ class RecipeAddPageView(View):
             recipe.ingredients.add(ingredient[0].id)
 
 
-class RecipeEditPageView(View):
+class RecipeEditPageView(LoginRequiredMixin, View):
     template_name = "recipes/recipe_form.html"
 
     def get(self, request, recipe_id):
@@ -192,12 +189,10 @@ class RecipeEditPageView(View):
         return changes
 
 
-class RecipeDeletePageView(View):
-    def get(self, request, recipe_id):
-        self.post(request, recipe_id)
-        messages.success(request, "Pomyślnie usunięto przepis")
-        return redirect("recipes-home-page")
+class RecipeDeleteView(LoginRequiredMixin, DeleteView):
+    model = Recipe
+    success_url = reverse_lazy("recipes-home-page")
 
-    def post(self, request, recipe_id):
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
-        recipe.delete()
+    def form_valid(self, form):
+        messages.success(self.request, "Pomyślnie usunięto przepis")
+        return super().form_valid(form)

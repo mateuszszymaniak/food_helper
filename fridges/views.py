@@ -1,32 +1,29 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.decorators import method_decorator
+from django.urls import reverse_lazy
 from django.views import View
+from django.views.generic import DeleteView
 
-from .forms import NewIngredientForm
 from .models import Fridge
 
 
-class FridgesHomePageView(View):
+class FridgesHomePageView(LoginRequiredMixin, View):
     template_name = "fridges/home.html"
 
-    @method_decorator(login_required)
     def get(self, request):
-        user_fridge = Fridge.objects.all().filter(user=request.user.pk).order_by("id")
+        user_fridge = Fridge.objects.filter(user=request.user.pk).order_by("id")
         context = {"title": "Fridge", "fridge": user_fridge}
         return render(request, self.template_name, context)
 
 
-class FridgeAddPageView(View):
+class FridgeAddPageView(LoginRequiredMixin, View):
     template_name = "fridges/fridge_form.html"
 
-    @method_decorator(login_required)
     def get(self, request):
         context = {"title": "Add Ingredient"}
         return render(request, self.template_name, context)
 
-    @method_decorator(login_required)
     def post(self, request):
         form = request.POST
         ingredients_list = list(filter(lambda key: key.startswith("quantity-"), form))
@@ -48,15 +45,11 @@ class FridgeAddPageView(View):
                     user=request.user.profile,
                 )
 
-            # if ingredient:
-            #     pass
-            # else:
-            #     Fridge.objects.create(name=name, quantity=quantity, quantity_type=quantity_type)
         messages.success(request, "Zawartość lodówki została dodana")
         return redirect("fridges-home-page")
 
 
-class IngredientEditPageView(View):
+class IngredientEditPageView(LoginRequiredMixin, View):
     template_name = "fridges/fridge_form.html"
 
     def get(self, request, ingredient_id):
@@ -74,12 +67,10 @@ class IngredientEditPageView(View):
         return redirect("fridges-home-page")
 
 
-class IngredientDeletePageView(View):
-    def get(self, request, ingredient_id):
-        self.post(request, ingredient_id)
-        messages.success(request, "Pomyślnie usunięto składnik")
-        return redirect("fridges-home-page")
+class IngredientDeleteView(LoginRequiredMixin, DeleteView):
+    model = Fridge
+    success_url = reverse_lazy("fridges-home-page")
 
-    def post(self, request, ingredient_id):
-        ingredient = get_object_or_404(Fridge, pk=ingredient_id)
-        ingredient.delete()
+    def form_valid(self, form):
+        messages.success(self.request, "Pomyślnie usunięto składnik")
+        return super().form_valid(form)

@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     FridgeAddPageView,
     FridgesHomePageView,
-    IngredientDeletePageView,
+    IngredientDeleteView,
     IngredientEditPageView,
 )
 
@@ -16,8 +16,8 @@ urlpatterns = [
         name="fridge-edit",
     ),
     path(
-        "fridges/<int:ingredient_id>/delete/",
-        IngredientDeletePageView.as_view(),
+        "fridges/<int:pk>/delete/",
+        IngredientDeleteView.as_view(),
         name="fridge-delete",
     ),
 ]
