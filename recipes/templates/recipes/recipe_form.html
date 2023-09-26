@@ -1,13 +1,10 @@
 {% extends 'users/dashboard_base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<p>Tutaj powinien być formularz dodawania przepisu</p>
-
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
             {% if form.id %}
-            <p>Test edycji z 1 szablonu</p>
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Edytuj przepis!</legend>
 
@@ -46,7 +43,7 @@
 
                     </tbody>
                 </table>
-                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
+                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Add ingredient</button>
 
                 <div id="div_id_preparation" class="form-group">
                     <label for="id_preparation" class=" requiredField">Preparation<span class="asteriskField">*</span></label>
@@ -67,7 +64,6 @@
             </div>
             {% else %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Dodaj przepis!</legend>
                 {{ form.recipe_form.recipe_name|as_crispy_field }}
                 Ingredient
                 <table id="ingredient-table">
@@ -83,12 +79,12 @@
 
                     </tbody>
                 </table>
-                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
+                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Add ingredient</button>
                 {{ form.recipe_form.preparation|as_crispy_field }}
                 {{ form.recipe_form.tags|as_crispy_field }}
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Dodaj</button>
+                <button class="btn btn-outline-info" type="submit">Add</button>
             </div>
             {% endif %}
         </form>
@@ -109,7 +105,7 @@
         newNameInput.innerHTML = `<input type="text" name="name-${number}" maxlength="50" class="textinput form-control" required id="id_name">`
 
         const deleteCell = document.createElement("td");
-        deleteCell.innerHTML = `<button type="button" name="delete-${number}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+        deleteCell.innerHTML = `<button type="button" name="delete-${number}" class="btn btn-danger" onclick="delete_ingredient(this)">Delete</button>`;
 
         newRow.appendChild(newQuantityInput);
         newRow.appendChild(newQuantityTypeChoice);

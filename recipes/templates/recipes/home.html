@@ -1,16 +1,16 @@
 {% extends 'users/dashboard_base.html' %}
 {% block content %}
-    <a href="{% url 'recipe-add' %}" class="btn btn-primary" role="button">Dodaj</a>
+    <a href="{% url 'recipe-add' %}" class="btn btn-primary" role="button">Add</a>
 {% if recipes %}
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
                 <thead>
                     <tr>
-                        <td>Nazwa przepisu</td>
-                        <td>Składniki</td>
-                        <td>Sposób przygotowania</td>
-                        <td>Tagi</td>
+                        <td>Recipe name</td>
+                        <td>Ingredients</td>
+                        <td>Preparation</td>
+                        <td>Tags</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,8 +28,13 @@
                 {% else %}
                     <td></td>
                 {% endif %}
-                <td><a href="{% url 'recipe-edit' recipe.id %}" class="btn btn-primary" role="button">Edytuj</a></td>
-                <td><a href="{% url 'recipe-delete' recipe.id %}" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć przepis?')" role="button">Usuń</a></td>
+                <td><a href="{% url 'recipe-edit' recipe.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                <td>
+                    <form method="post" action="{% url 'recipe-delete' recipe.id %}">
+                        {% csrf_token %}
+                     <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć przepis?')" value="Delete">
+                    </form>
+                </td>
             </tr>
         </tbody>
         {% endfor %}
@@ -38,7 +43,7 @@
         </div>
     </div>
 {% else %}
-    <p>Dodaj przepis</p>
+    <p>Add recipe</p>
 {% endif %}
 
 {% endblock %}

@@ -1,13 +1,10 @@
 {% extends 'users/dashboard_base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<p>Tutaj powinien być formularz dodawania zawartości lodówki</p>
-
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
             {% if ingredient.id %}
-            <p>Test edycji z 1 szablonu</p>
                 <table id="ingredient-table">
                     <thead>
                         <tr>
@@ -32,11 +29,10 @@
                     </tbody>
                 </table>
                 <div class="form-group">
-                    <button class="btn btn-outline-info" type="submit">Zapisz zmiany</button>
+                    <button class="btn btn-outline-info" type="submit">Save changes</button>
                 </div>
             {% else %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Dodaj składnik!</legend>
                 Ingredient
                 <table id="ingredient-table">
                     <thead>
@@ -51,10 +47,10 @@
 
                     </tbody>
                 </table>
-                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Dodaj składnik</button>
+                <button type="button" class="btn btn-primary" onclick="add_ingredient()">Add ingredient</button>
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Dodaj</button>
+                <button class="btn btn-outline-info" type="submit">Add</button>
             </div>
             {% endif %}
         </form>
@@ -75,7 +71,7 @@
         newNameInput.innerHTML = `<input type="text" name="name-${number}" maxlength="50" class="textinput form-control" required id="id_name">`
 
         const deleteCell = document.createElement("td");
-        deleteCell.innerHTML = `<button type="button" name="delete-${number}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button>`;
+        deleteCell.innerHTML = `<button type="button" name="delete-${number}" class="btn btn-danger" onclick="delete_ingredient(this)">Delete</button>`;
 
         newRow.appendChild(newQuantityInput);
         newRow.appendChild(newQuantityTypeChoice);

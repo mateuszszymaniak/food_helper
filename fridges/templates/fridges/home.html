@@ -1,6 +1,6 @@
 {% extends 'users/dashboard_base.html' %}
 {% block content %}
-    <a href="{% url 'fridge-add' %}" class="btn btn-primary" role="button">Dodaj</a>
+    <a href="{% url 'fridge-add' %}" class="btn btn-primary" role="button">Add</a>
 {% if fridge %}
     <div class="card-body">
         <div class="table-responsive">
@@ -18,8 +18,13 @@
                 <td>{{ ingredient.quantity }}</td>
                 <td>{{ ingredient.quantity_type }}</td>
                 <td>{{ ingredient.name }}</td>
-                <td><a href="{% url 'fridge-edit' ingredient.id %}" class="btn btn-primary" role="button">Edytuj</a></td>
-                <td><a href="{% url 'fridge-delete' ingredient.id %}" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" role="button">Usuń</a></td>
+                <td><a href="{% url 'fridge-edit' ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                <td>
+                    <form method="post" action="{% url 'fridge-delete' ingredient.id %}">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" value="Delete">
+                    </form>
+                </td>
             </tr>
         </tbody>
         {% endfor %}
@@ -27,6 +32,6 @@
         </div>
     </div>
 {% else %}
-    <p>Dodaj zawartość lodówki</p>
+    <p>Add items from fridge</p>
 {% endif %}
 {% endblock %}
