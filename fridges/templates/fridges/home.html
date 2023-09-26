@@ -1,21 +1,20 @@
-{% extends 'users/base.html' %}
+{% extends 'users/dashboard_base.html' %}
 {% block content %}
-<p>Strona domowa 'lodówki'</p>
     <a href="{% url 'fridge-add' %}" class="btn btn-primary" role="button">Dodaj</a>
 {% if fridge %}
-    <table id="recipes-table">
-        <thead>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Quantity type</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for ingredient in fridge %}
             <tr>
-                <th scope="col">Nr.</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Quantity Type</th>
-                <th scope="col">Name</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for ingredient in fridge %}
-            <tr>
-                <th scope="row">{{ ingredient.id }}</th>
                 <td>{{ ingredient.quantity }}</td>
                 <td>{{ ingredient.quantity_type }}</td>
                 <td>{{ ingredient.name }}</td>
@@ -24,7 +23,9 @@
             </tr>
         </tbody>
         {% endfor %}
-    </table>
+            </table>
+        </div>
+    </div>
 {% else %}
     <p>Dodaj zawartość lodówki</p>
 {% endif %}

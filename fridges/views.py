@@ -14,7 +14,7 @@ class FridgesHomePageView(View):
     @method_decorator(login_required)
     def get(self, request):
         user_fridge = Fridge.objects.all().filter(user=request.user.pk).order_by("id")
-        context = {"title": "Fridges", "fridge": user_fridge}
+        context = {"title": "Fridge", "fridge": user_fridge}
         return render(request, self.template_name, context)
 
 

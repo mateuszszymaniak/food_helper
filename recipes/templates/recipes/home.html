@@ -1,22 +1,21 @@
-{% extends 'users/base.html' %}
+{% extends 'users/dashboard_base.html' %}
 {% block content %}
-<p>Strona domowa przepisów</p>
     <a href="{% url 'recipe-add' %}" class="btn btn-primary" role="button">Dodaj</a>
 {% if recipes %}
-    <table id="recipes-table">
-        <thead>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                <thead>
+                    <tr>
+                        <td>Nazwa przepisu</td>
+                        <td>Składniki</td>
+                        <td>Sposób przygotowania</td>
+                        <td>Tagi</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recipe in recipes %}
             <tr>
-                <th scope="col">Nr.</th>
-                <th scope="col">Nazwa przepisu</th>
-                <th scope="col">Składniki</th>
-                <th scope="col">Sposób przygotowania</th>
-                <th scope="col">Tagi</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for recipe in recipes %}
-            <tr>
-                <th scope="row">{{ recipe.id }}</th>
                 <td>{{ recipe.recipe_name }}</td>
                 <td>
                 {% for ingredients in recipe.ingredients %}
@@ -34,9 +33,12 @@
             </tr>
         </tbody>
         {% endfor %}
-    </table>
-    {{ recipe.ingredients }}
+
+            </table>
+        </div>
+    </div>
 {% else %}
     <p>Dodaj przepis</p>
 {% endif %}
+
 {% endblock %}
