@@ -70,13 +70,14 @@ class HomePageView(View):
     context = {"title": "Home Page"}
 
     def get(self, request):
-        if request.user:
+        if request.user.is_authenticated:
             user_fridge = Fridge.objects.all().filter(user=request.user.pk)
             user_recipes = Recipe.objects.all().filter(user=request.user.pk)
             fridge = self.get_fridge_ingredients(user_fridge)
             ready_recipes, sorted_keys = self.ready_recipes(user_recipes, fridge)
             self.context["ready_recipes"] = ready_recipes
             self.context["sorted_keys"] = sorted_keys
+            self.template_name = "users/dashboard.html"
             return render(request, self.template_name, self.context)
         else:
             return render(request, self.template_name, self.context)

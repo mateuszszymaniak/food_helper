@@ -1,0 +1,51 @@
+{% extends 'users/dashboard_base.html' %}
+{% load custom_filters %}
+{% block content %}
+    {% if user.is_authenticated %}
+
+    {% for key in sorted_keys %}
+    <div class="card shadow mb-4">
+    {% if key == '0' %}
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Przepisy, które można zrobić</h6>
+        </div>
+    {% else %}
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Brakujące składniki w przepisach: {{ key }}</h6>
+        </div>
+    {% endif %}
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>Składniki</th>
+                        <th>Przygotowanie</th>
+                        <th>Tagi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recipe in ready_recipes|get_item:key %}
+            <tr>
+                <td>{{ recipe.recipe_name }}</td>
+                <td>
+                {% for ingredients in recipe.ingredients.all %}
+                    <li>{{ ingredients.quantity }} {{ ingredients.quantity_type }} {{ ingredients.name }}</li>
+                {% endfor %}
+                </td>
+                <td>{{ recipe.preparation }}</td>
+                {% if recipe.tags %}
+                    <td>{% for tag in recipe.tags %}{{ tag }}{% endfor %}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+        {% endfor %}
+{% endif %}
+{% endblock %}
