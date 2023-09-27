@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (
     RecipeAddPageView,
-    RecipeDeletePageView,
+    RecipeDeleteView,
     RecipeEditPageView,
     RecipesHomePageView,
 )
@@ -16,8 +16,8 @@ urlpatterns = [
         name="recipe-edit",
     ),
     path(
-        "recipes/<int:recipe_id>/delete/",
-        RecipeDeletePageView.as_view(),
+        "recipes/<int:pk>/delete/",
+        RecipeDeleteView.as_view(),
         name="recipe-delete",
     ),
 ]
