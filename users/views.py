@@ -59,9 +59,7 @@ class MyLoginView(LoginView):
             username = form.data.get("username")
             user_exist = get_user_model().objects.filter(username=username).exists()
             if user_exist:
-                Profile.objects.filter(user=user_exist).update(
-                    failed_login_date=datetime.now()
-                )
+                Profile.objects.filter(user=user_exist)
         return redirect("login-page")
 
 
