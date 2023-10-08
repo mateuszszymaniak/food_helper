@@ -36,9 +36,6 @@ ALLOWED_HOSTS = []
 
 
 INSTALLED_APPS = [
-    "users.apps.UserConfig",
-    "recipes.apps.RecipesConfig",
-    "fridges.apps.FridgesConfig",
     "crispy_forms",
     "crispy_bootstrap4",
     "django.contrib.admin",
@@ -47,7 +44,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
 ]
+
+INSTALLED_EXTENSIONS = [
+    "users",
+    "recipes",
+    "fridges",
+]
+
+INSTALLED_APPS += INSTALLED_EXTENSIONS
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
