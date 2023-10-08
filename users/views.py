@@ -3,7 +3,9 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -40,7 +42,6 @@ class MyResetPasswordView(PasswordResetView):
             user.save()
             messages.success(self.request, "Password successfully reset.")
             return redirect("login-page")
-            # return super().form_valid(form) TODO fix later
         else:
             messages.error(self.request, "Passwords are not the same")
             return redirect("reset-password-page")
@@ -57,9 +58,15 @@ class MyLoginView(LoginView):
     def form_invalid(self, form):
         if self.request.method == "POST":
             username = form.data.get("username")
-            user_exist = get_user_model().objects.filter(username=username).exists()
+            password = form.data.get("password")
+            user_exist = (
+                get_user_model()
+                .objects.filter(Q(username=username) & Q(password=password))
+                .exists()
+            )
             if user_exist:
                 Profile.objects.filter(user=user_exist)
+                return redirect("home-page")
         return redirect("login-page")
 
 
@@ -131,12 +138,13 @@ class RegisterView(View):
     def post(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "User created correctly")
-            return redirect("login-page")
-        else:
-            messages.warning(request, "Form have invalid data")
-            return redirect("register-page")
+            email_in_db = User.objects.filter(email=form.data.get("email"))
+            if not email_in_db:
+                form.save()
+                messages.success(request, "User created correctly")
+                return redirect("login-page")
+        messages.warning(request, "Form have invalid data")
+        return redirect("register-page")
 
 
 class ResetPasswordView(View):
