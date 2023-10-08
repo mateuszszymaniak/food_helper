@@ -76,10 +76,9 @@ class HomePageView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            user_fridge = Fridge.objects.all().filter(user=request.user.pk)
-            user_recipes = Recipe.objects.all().filter(user=request.user.pk)
-            fridge = self.get_fridge_ingredients(user_fridge)
-            ready_recipes, sorted_keys = self.ready_recipes(user_recipes, fridge)
+            user_fridge = request.user.profile.fridges.all()
+            user_recipes = request.user.profile.recipes.all()
+            ready_recipes, sorted_keys = self.ready_recipes(user_recipes, user_fridge)
             self.context["ready_recipes"] = ready_recipes
             self.context["sorted_keys"] = sorted_keys
             self.template_name = "users/dashboard.html"
@@ -87,23 +86,11 @@ class HomePageView(View):
         else:
             return render(request, self.template_name, self.context)
 
-    def get_recipe_ingredients(self, recipe):
-        ingredients = []
-        for ingredient in recipe.ingredients.all():
-            ingredients.append(ingredient)
-        return ingredients
-
-    def get_fridge_ingredients(self, user_fridge):
-        fridge = []
-        for ingredient in user_fridge:
-            fridge.append(ingredient)
-        return fridge
-
     def ready_recipes(self, user_recipes, fridge):
         result_recipes = {}
 
         for recipe in user_recipes:
-            ingredients = self.get_recipe_ingredients(recipe)
+            ingredients = recipe.ingredients.all()
             missing_ingredients_counter = 0
             for ingredient_item in ingredients:
                 ingredient_name = ingredient_item.name
@@ -112,7 +99,7 @@ class HomePageView(View):
                 for fridge_item in fridge:
                     if (
                         ingredient_name == fridge_item.name
-                        and ingredient_quantity < int(fridge_item.quantity)
+                        and ingredient_quantity <= int(fridge_item.quantity)
                     ):
                         ingredient_found = True
                         break
