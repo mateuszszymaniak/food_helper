@@ -28,7 +28,7 @@ class Recipe(models.Model):
     preparation = models.TextField(blank=False, default="")
     tags = ArrayField(models.CharField(max_length=20, null=True), blank=True, null=True)
     ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient")
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="recipes")
 
 
 class RecipeIngredient(models.Model):

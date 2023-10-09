@@ -3,7 +3,9 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -40,7 +42,6 @@ class MyResetPasswordView(PasswordResetView):
             user.save()
             messages.success(self.request, "Password successfully reset.")
             return redirect("login-page")
-            # return super().form_valid(form) TODO fix later
         else:
             messages.error(self.request, "Passwords are not the same")
             return redirect("reset-password-page")
@@ -57,9 +58,15 @@ class MyLoginView(LoginView):
     def form_invalid(self, form):
         if self.request.method == "POST":
             username = form.data.get("username")
-            user_exist = get_user_model().objects.filter(username=username).exists()
+            password = form.data.get("password")
+            user_exist = (
+                get_user_model()
+                .objects.filter(Q(username=username) & Q(password=password))
+                .exists()
+            )
             if user_exist:
                 Profile.objects.filter(user=user_exist)
+                return redirect("home-page")
         return redirect("login-page")
 
 
@@ -69,10 +76,9 @@ class HomePageView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            user_fridge = Fridge.objects.all().filter(user=request.user.pk)
-            user_recipes = Recipe.objects.all().filter(user=request.user.pk)
-            fridge = self.get_fridge_ingredients(user_fridge)
-            ready_recipes, sorted_keys = self.ready_recipes(user_recipes, fridge)
+            user_fridge = request.user.profile.fridges.all()
+            user_recipes = request.user.profile.recipes.all()
+            ready_recipes, sorted_keys = self.ready_recipes(user_recipes, user_fridge)
             self.context["ready_recipes"] = ready_recipes
             self.context["sorted_keys"] = sorted_keys
             self.template_name = "users/dashboard.html"
@@ -80,23 +86,11 @@ class HomePageView(View):
         else:
             return render(request, self.template_name, self.context)
 
-    def get_recipe_ingredients(self, recipe):
-        ingredients = []
-        for ingredient in recipe.ingredients.all():
-            ingredients.append(ingredient)
-        return ingredients
-
-    def get_fridge_ingredients(self, user_fridge):
-        fridge = []
-        for ingredient in user_fridge:
-            fridge.append(ingredient)
-        return fridge
-
     def ready_recipes(self, user_recipes, fridge):
         result_recipes = {}
 
         for recipe in user_recipes:
-            ingredients = self.get_recipe_ingredients(recipe)
+            ingredients = recipe.ingredients.all()
             missing_ingredients_counter = 0
             for ingredient_item in ingredients:
                 ingredient_name = ingredient_item.name
@@ -105,7 +99,7 @@ class HomePageView(View):
                 for fridge_item in fridge:
                     if (
                         ingredient_name == fridge_item.name
-                        and ingredient_quantity < int(fridge_item.quantity)
+                        and ingredient_quantity <= int(fridge_item.quantity)
                     ):
                         ingredient_found = True
                         break
@@ -131,12 +125,13 @@ class RegisterView(View):
     def post(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "User created correctly")
-            return redirect("login-page")
-        else:
-            messages.warning(request, "Form have invalid data")
-            return redirect("register-page")
+            email_in_db = User.objects.filter(email=form.data.get("email"))
+            if not email_in_db:
+                form.save()
+                messages.success(request, "User created correctly")
+                return redirect("login-page")
+        messages.warning(request, "Form have invalid data")
+        return redirect("register-page")
 
 
 class ResetPasswordView(View):

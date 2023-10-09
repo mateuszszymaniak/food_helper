@@ -22,4 +22,4 @@ class Fridge(models.Model):
         null=True,
         blank=True,
     )
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="fridges")
