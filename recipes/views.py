@@ -53,13 +53,16 @@ class RecipeAddPageView(LoginRequiredMixin, View):
 
     def post(self, request):
         form = RecipeIngredientsForm(request.POST)
-        if form.is_valid():
+        if form.is_valid(request.POST):
             recipe = form.save(commit=False)
             recipe.user = request.user.profile
             recipe.save()
             self.add_ingredients_to_recipe(request.POST, recipe)
             messages.success(request, "Przepis został dodany")
             return redirect("recipes-home-page")
+        else:
+            messages.warning(request, "Invalid data in recipe")
+            return redirect("recipe-add")
 
     def add_ingredients_to_recipe(self, data, recipe):
         ingredients_list = list(filter(lambda key: key.startswith("quantity-"), data))

@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 
 from .models import Ingredient, Recipe
@@ -29,3 +31,14 @@ class RecipeIngredientsForm(forms.Form):
             recipe.save()
 
         return recipe
+
+    def is_valid(self, data):
+        name_pattern = any(key for key in data if re.match(r"name-\d+", key))
+        quantity_pattern = any(key for key in data if re.match(r"quantity-\d+", key))
+        quantity_type_pattern = any(
+            key for key in data if re.match(r"quantity_type-\d+", key)
+        )
+        if name_pattern and quantity_pattern and quantity_type_pattern:
+            return super().is_valid()
+        else:
+            return False
