@@ -89,6 +89,8 @@ class TestViews(TestCase):
         self.assertTemplateUsed(response, "users/register.html")
 
     def test_register_page_view_POST_correct_data(self):
+        initial_count = User.objects.count()
+
         register_data = {
             "username": "Test001",
             "email": "tyu@tyu.tyu",
@@ -96,8 +98,10 @@ class TestViews(TestCase):
             "password2": "Tyu123!@#",
         }
         response = self.client.post(self.register_page, register_data)
+        final_count = User.objects.count()
         self.assertEquals(response.status_code, HTTPStatus.FOUND)
         self.assertRedirects(response, expected_url=self.login_page)
+        self.assertEquals(final_count, initial_count + 1)
 
     def test_register_page_view_POST_incorrect_data(self):
         """
