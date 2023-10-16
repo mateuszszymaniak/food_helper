@@ -67,6 +67,7 @@ class MyLoginView(LoginView):
             if user_exist:
                 Profile.objects.filter(user=user_exist)
                 return redirect("home-page")
+        messages.warning(self.request, "Incorrect login or password")
         return redirect("login-page")
 
 
