@@ -38,7 +38,14 @@ class RecipeIngredientsForm(forms.Form):
         quantity_type_pattern = any(
             key for key in data if re.match(r"quantity_type-\d+", key)
         )
-        if name_pattern and quantity_pattern and quantity_type_pattern:
+        if (
+            name_pattern
+            and quantity_pattern
+            and quantity_type_pattern
+            and "recipe_name" in data
+            and "preparation" in data
+            and "tags" in data
+        ):
             return super().is_valid()
         else:
             return False

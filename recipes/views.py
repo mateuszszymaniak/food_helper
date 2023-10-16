@@ -89,7 +89,7 @@ class RecipeEditPageView(LoginRequiredMixin, View):
 
     def post(self, request, recipe_id):
         form = RecipeIngredientsForm(request.POST)
-        if form.is_valid():
+        if form.is_valid(request.POST):
             recipe = Recipe.objects.get(id=recipe_id)
             self.ingredients_change(recipe, form)
             changes = self.find_changes(recipe, form)
@@ -99,6 +99,9 @@ class RecipeEditPageView(LoginRequiredMixin, View):
             recipe.save()
             messages.success(request, "Przepis został zaktualizowany")
             return redirect("recipes-home-page")
+        else:
+            messages.warning(request, "Invalid data in recipe")
+            return redirect("recipe-edit")
 
     def ingredients_change(self, recipe, form):
         ingredients_list = list(
