@@ -24,11 +24,20 @@ class RecipesViews(TestCase):
         self.user1.save()
         self.profile1, _ = Profile.objects.get_or_create(user=self.user1)
         self.client.force_login(self.user1)
+        self.recipe_recipe_name = "rec1"
+        self.recipe_preparation = "123\nqwe"
         self.recipe1 = Recipe.objects.create(
-            recipe_name="rec1", preparation="123\nqwe", user=self.profile1
+            recipe_name=self.recipe_recipe_name,
+            preparation=self.recipe_preparation,
+            user=self.profile1,
         )
+        self.ingredient_name = "ing1"
+        self.ingredient_quantity = "1"
+        self.ingredient_quantity_type = "l"
         self.ingredient1 = Ingredient.objects.get_or_create(
-            name="ing1", quantity="1", quantity_type="l"
+            name=self.ingredient_name,
+            quantity=self.ingredient_quantity,
+            quantity_type=self.ingredient_quantity_type,
         )
         self.recipe1.ingredients.add(self.ingredient1[0].id)
         self.recipe_edit_page = reverse("recipe-edit", args=[self.recipe1.id])
@@ -132,19 +141,29 @@ class RecipesViews(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/recipe_form.html")
 
-        # TODO dopisać POSTa
+    def test_recipe_edit_page_view_POST_correct_data(self):
+        recipe_data = {
+            "recipe_name": "check_edit",
+            "preparation": self.recipe_preparation,
+        }
+        recipe_data["name-0"] = self.ingredient_name
+        recipe_data["quantity-0"] = self.ingredient_quantity
+        recipe_data["quantity_type-0"] = self.ingredient_quantity_type
+
+        response = self.client.post(self.recipe_edit_page, recipe_data, follow=True)
+        self.assertEquals(
+            Recipe.objects.get(id=self.recipe1.id).recipe_name, "check_edit"
+        )
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Przepis został zaktualizowany")
+        self.assertRedirects(response, expected_url=self.recipes_home_page)
 
     # endregion
     # region tests for delete view
     def test_recipe_delete(self):
-        initial_recipe = Recipe.objects.count()
-        initial_ingredients = Ingredient.objects.count()
-        response = self.client.post(self.recipe_delete_page)
-        finish_recipe = Recipe.objects.count()
-        finish_ingredients = Ingredient.objects.count()
+        self.client.post(self.recipe_delete_page)
 
-        self.assertEquals(finish_recipe, initial_recipe - 1)
-        self.assertEquals(finish_ingredients, initial_ingredients - 1)
+        self.assertEquals(Recipe.objects.count(), 0)
+        self.assertEquals(Ingredient.objects.count(), 0)
 
-    # TODO post?
     # endregion
