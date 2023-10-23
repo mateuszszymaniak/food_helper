@@ -5,8 +5,10 @@ from django.urls import reverse
 
 from users.models import Profile, User
 
+HOME_PAGE = "home-page"
 
-@tag("x")
+
+# @tag('x')
 class TestViews(TestCase):
     def setUp(self):
         self.home_page = reverse("home-page")
@@ -23,7 +25,7 @@ class TestViews(TestCase):
         )
         self.user1.set_password(self.user_password)
         self.user1.save()
-        self.profile1, _ = Profile.objects.get_or_create(user=self.user1)
+        self.profile1 = Profile.objects.get(user=self.user1)
 
     # region tests for home view
     def test_home_page_view_GET(self):
