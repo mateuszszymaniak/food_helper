@@ -3,6 +3,7 @@ from http import HTTPStatus
 from django.test import TestCase, tag
 from django.urls import reverse
 
+from users.factories import UserFactory
 from users.models import Profile, User
 
 from ..factories import IngredientFactory, RecipeFactory
@@ -24,20 +25,17 @@ class RecipesViews(TestCase):
         self.user1.save()
         self.profile1, _ = Profile.objects.get_or_create(user=self.user1)
         self.client.force_login(self.user1)
-        self.recipe_recipe_name = "rec1"
-        self.recipe_preparation = "123\nqwe"
+        self.recipe = RecipeFactory.create()
         self.recipe1 = Recipe.objects.create(
-            recipe_name=self.recipe_recipe_name,
-            preparation=self.recipe_preparation,
+            recipe_name=self.recipe.recipe_name,
+            preparation=self.recipe.preparation,
             user=self.profile1,
         )
-        self.ingredient_name = "ing1"
-        self.ingredient_quantity = "1"
-        self.ingredient_quantity_type = "l"
+        self.ingredient = IngredientFactory.create()
         self.ingredient1 = Ingredient.objects.get_or_create(
-            name=self.ingredient_name,
-            quantity=self.ingredient_quantity,
-            quantity_type=self.ingredient_quantity_type,
+            name=self.ingredient.name,
+            quantity=self.ingredient.quantity,
+            quantity_type=self.ingredient.quantity_type,
         )
         self.recipe1.ingredients.add(self.ingredient1[0].id)
         self.recipe_edit_page = reverse("recipe-edit", args=[self.recipe1.id])
@@ -61,6 +59,7 @@ class RecipesViews(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/recipe_form.html")
 
+    @tag("x")
     def test_recipe_add_page_view_POST_correct_data(self):
         Recipe.objects.all().delete()
         Ingredient.objects.all().delete()
@@ -144,11 +143,11 @@ class RecipesViews(TestCase):
     def test_recipe_edit_page_view_POST_correct_data(self):
         recipe_data = {
             "recipe_name": "check_edit",
-            "preparation": self.recipe_preparation,
+            "preparation": self.recipe.preparation,
         }
-        recipe_data["name-0"] = self.ingredient_name
-        recipe_data["quantity-0"] = self.ingredient_quantity
-        recipe_data["quantity_type-0"] = self.ingredient_quantity_type
+        recipe_data["name-0"] = self.ingredient.name
+        recipe_data["quantity-0"] = self.ingredient.quantity
+        recipe_data["quantity_type-0"] = self.ingredient.quantity_type
 
         response = self.client.post(self.recipe_edit_page, recipe_data, follow=True)
         self.assertEquals(
