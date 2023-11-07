@@ -75,16 +75,13 @@ class RecipeEditPageView(LoginRequiredMixin, View):
     def post(self, request, recipe_id):
         form = CreateNewRecipe(request.POST)
         if form.is_valid():
-            pressed_ingredient = list(filter(lambda x: "edit-" in x, request.POST))
             Recipe.objects.filter(id=recipe_id).update(
                 recipe_name=request.POST.get("recipe_name"),
                 preparation=request.POST.get("preparation"),
                 tags=[request.POST.get("tags")],
             )
             if "add_ingredient" in request.POST:
-                return redirect("ingredient-add", recipe_id)
-            if pressed_ingredient[0] in request.POST:
-                return redirect("ingredient-edit", recipe_id, pressed_ingredient[0][5:])
+                return redirect("ingredients:ingredient-add", recipe_id)
             else:
                 messages.success(request, "Przepis został zaktualizowany")
                 return redirect("recipes-home-page")

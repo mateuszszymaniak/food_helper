@@ -31,8 +31,13 @@
                         <td>{{ ingredient.quantity }}</td>
                         <td>{{ ingredient.quantity_type }}</td>
                         <td>{{ ingredient.name }}</td>
-                            <td><button type="submit" name="edit-{{ ingredient.id }}" class="btn btn-primary">Edit</button></td>
-                            <td><button type="button" name="delete-{{ ingredient.id }}" class="btn btn-danger" onclick="delete_ingredient(this)">Usuń</button></td>
+                            <td><a href="{% url 'ingredients:ingredient-edit' form.id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                            <td>
+                                <form method="post" action="{% url 'ingredients:ingredient-delete' form.id ingredient.id %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" value="Delete">
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
 
@@ -73,10 +78,4 @@
             {% endif %}
         </form>
     </div>
-    <script>
-    function delete_ingredient(button){
-        const row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-    }
-    </script>
 {% endblock %}

@@ -1,6 +1,9 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views import View
+from django.views.generic import DeleteView
 
 from recipes.models import Recipe
 
@@ -44,3 +47,17 @@ class IngredientEditView(LoginRequiredMixin, View):
                 quantity_type=request.POST.get("quantity_type"),
             )
             return redirect("recipe-edit", recipe_id)
+
+
+class IngredientDeleteView(LoginRequiredMixin, DeleteView):
+    model = Ingredient
+
+    def get_success_url(self):
+        recipe_id = self.kwargs["recipe_id"]
+        success_url = reverse("recipe-edit", kwargs={"recipe_id": recipe_id})
+
+        return success_url
+
+    def form_valid(self, form):
+        messages.success(self.request, "Pomyślnie usunięto składnik")
+        return super().form_valid(form)
