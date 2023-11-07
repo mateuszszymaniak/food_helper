@@ -6,8 +6,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DeleteView
 
-from .forms import RecipeIngredientsForm
-from .models import Ingredient, Recipe, RecipeIngredient
+from .forms import CreateNewRecipe
+from .models import Recipe
 
 
 class RecipesHomePageView(LoginRequiredMixin, View):
@@ -46,35 +46,20 @@ class RecipeAddPageView(LoginRequiredMixin, View):
     template_name = "recipes/recipe_form.html"
 
     def get(self, request):
-        form = RecipeIngredientsForm()
+        form = CreateNewRecipe()
         context = {"title": "Add Recipe", "form": form}
 
         return render(request, self.template_name, context)
 
     def post(self, request):
-        form = RecipeIngredientsForm(request.POST)
-        if form.is_valid(request.POST):
-            recipe = form.save(commit=False)
-            recipe.user = request.user.profile
-            recipe.save()
-            self.add_ingredients_to_recipe(request.POST, recipe)
-            messages.success(request, "Przepis został dodany")
-            return redirect("recipes-home-page")
-        else:
-            messages.warning(request, "Invalid data in recipe")
-            return redirect("recipe-add")
-
-    def add_ingredients_to_recipe(self, data, recipe):
-        ingredients_list = list(filter(lambda key: key.startswith("quantity-"), data))
-        for prefix in ingredients_list:
-            quantity = data.get(prefix)
-            name = data.get(f"{prefix.replace('quantity', 'name')}")
-            quantity_type = data.get(f"{prefix.replace('quantity', 'quantity_type')}")
-
-            ingredient = Ingredient.objects.get_or_create(
-                name=name, quantity=quantity, quantity_type=quantity_type
-            )
-            recipe.ingredients.add(ingredient[0].id)
+        form = CreateNewRecipe(request.POST)
+        if form.is_valid():
+            if "add_ingredient" in request.POST:
+                recipe = form.save(commit=False)
+                recipe.user = request.user.profile
+                recipe.save()
+                return redirect("ingredient-add", recipe.id)
+        pass
 
 
 class RecipeEditPageView(LoginRequiredMixin, View):
@@ -88,111 +73,24 @@ class RecipeEditPageView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, recipe_id):
-        form = RecipeIngredientsForm(request.POST)
-        if form.is_valid(request.POST):
-            recipe = Recipe.objects.get(id=recipe_id)
-            self.ingredients_change(recipe, form)
-            changes = self.find_changes(recipe, form)
-            if changes is not None:
-                for field, (old_value, new_value) in changes.items():
-                    setattr(recipe, field, new_value)
-            recipe.save()
-            messages.success(request, "Przepis został zaktualizowany")
-            return redirect("recipes-home-page")
+        form = CreateNewRecipe(request.POST)
+        if form.is_valid():
+            pressed_ingredient = list(filter(lambda x: "edit-" in x, request.POST))
+            Recipe.objects.filter(id=recipe_id).update(
+                recipe_name=request.POST.get("recipe_name"),
+                preparation=request.POST.get("preparation"),
+                tags=[request.POST.get("tags")],
+            )
+            if "add_ingredient" in request.POST:
+                return redirect("ingredient-add", recipe_id)
+            if pressed_ingredient[0] in request.POST:
+                return redirect("ingredient-edit", recipe_id, pressed_ingredient[0][5:])
+            else:
+                messages.success(request, "Przepis został zaktualizowany")
+                return redirect("recipes-home-page")
         else:
             messages.warning(request, "Invalid data in recipe")
             return redirect("recipe-edit")
-
-    def ingredients_change(self, recipe, form):
-        ingredients_list = list(
-            filter(lambda key: key.startswith("quantity-"), form.data)
-        )
-
-        old_ingredients = recipe.ingredients.all()
-        if len(old_ingredients) == len(ingredients_list):
-            for counter, prefix in enumerate(ingredients_list):
-                quantity = form.data.get(prefix)
-                name = form.data.get(f"{prefix.replace('quantity', 'name')}")
-                quantity_type = form.data.get(
-                    f"{prefix.replace('quantity', 'quantity_type')}"
-                )
-                try:
-                    ingredient = get_object_or_404(
-                        Ingredient,
-                        name=name,
-                        quantity=quantity,
-                        quantity_type=quantity_type,
-                    )
-                except Http404:
-                    ingredient = Ingredient.objects.create(
-                        name=name, quantity=quantity, quantity_type=quantity_type
-                    )
-
-                if ingredient != old_ingredients[counter]:
-                    recipe_ingredient = RecipeIngredient.objects.filter(
-                        recipe=recipe, ingredient=old_ingredients[counter]
-                    ).first()
-                    recipe_ingredient.ingredient = ingredient
-                    recipe_ingredient.save()
-        elif len(old_ingredients) < len(ingredients_list):
-            for prefix in ingredients_list:
-                quantity = form.data.get(prefix)
-                name = form.data.get(f"{prefix.replace('quantity', 'name')}")
-                quantity_type = form.data.get(
-                    f"{prefix.replace('quantity', 'quantity_type')}"
-                )
-                try:
-                    ingredient, created = Ingredient.objects.get_or_create(
-                        name=name, quantity=quantity, quantity_type=quantity_type
-                    )
-                    if not recipe.ingredients.filter(id=ingredient.id).exists():
-                        RecipeIngredient.objects.create(
-                            recipe=recipe, ingredient=ingredient
-                        )
-                except Exception as e:
-                    print(e)
-        else:
-            recipe_ingredient = RecipeIngredient.objects.filter(recipe=recipe)
-            actual_ingredients = []
-            for prefix in ingredients_list:
-                quantity = form.data.get(prefix)
-                name = form.data.get(f"{prefix.replace('quantity', 'name')}")
-                quantity_type = form.data.get(
-                    f"{prefix.replace('quantity', 'quantity_type')}"
-                )
-                try:
-                    ingredient, created = Ingredient.objects.get_or_create(
-                        name=name, quantity=quantity, quantity_type=quantity_type
-                    )
-                    actual_ingredients.append(ingredient.id)
-                    if not recipe.ingredients.filter(id=ingredient.id).exists():
-                        RecipeIngredient.objects.create(
-                            recipe=recipe, ingredient=ingredient
-                        )
-                except Exception as e:
-                    print(e)
-
-            delete_ingredients = recipe_ingredient.exclude(
-                ingredient_id__in=actual_ingredients
-            )
-            delete_ingredients.delete()
-
-    def find_changes(self, recipe, form):
-        changes = {}
-        recipe_name_from_recipe = recipe.recipe_name
-        recipe_name_from_form = form.data.get("recipe_name")
-        preparation_from_recipe = recipe.preparation
-        preparation_from_form = form.data.get("preparation")
-        tags_from_recipe = recipe.tags
-        tags_from_form = [form.data.get("tags")]
-
-        if recipe_name_from_recipe != recipe_name_from_form:
-            changes["recipe_name"] = (recipe_name_from_recipe, recipe_name_from_form)
-        if preparation_from_recipe != preparation_from_form:
-            changes["preparation"] = (preparation_from_recipe, preparation_from_form)
-        if tags_from_recipe != tags_from_form:
-            changes["tags"] = (tags_from_recipe, tags_from_form)
-        return changes
 
 
 class RecipeDeleteView(LoginRequiredMixin, DeleteView):
