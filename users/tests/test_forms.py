@@ -5,17 +5,12 @@ from ..forms import UserRegisterForm
 
 
 class UserRegisterFormTest(TestCase):
-    def setUp(self):
-        self.user = UserFactory.create()
-
-    @tag("x")
     def test_valid_user_register_form(self):
-        user = UserFactory.create()
         form_data = {
-            "username": self.user.username,
-            "email": self.user.email,
-            "password1": self.user.password,
-            "password2": self.user.password,
+            "username": "Xyz123",
+            "email": "xyz123@xyz.pl",
+            "password1": "Test123!",
+            "password2": "Test123!",
         }
 
         form = UserRegisterForm(data=form_data)
