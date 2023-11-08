@@ -4,9 +4,9 @@ from django.test import TestCase, tag
 from django.urls import reverse
 
 from users.factories import UserFactory
-from users.models import Profile, User
+from users.models import Profile
 
-from ..factories import IngredientFactory, RecipeFactory
+from ..factories import RecipeFactory
 from ..models import Ingredient, Recipe
 
 
@@ -14,15 +14,7 @@ class RecipesViews(TestCase):
     def setUp(self):
         self.recipes_home_page = reverse("recipes-home-page")
         self.recipe_add_page = reverse("recipe-add")
-        self.user_username = "user1"
-        self.user_password = "pass1!"  # nosec bandit B105
-        self.user_email = "email@email.pl"
-        self.user1 = User.objects.create(
-            username=self.user_username,
-            email=self.user_email,
-        )
-        self.user1.set_password(self.user_password)
-        self.user1.save()
+        self.user1 = UserFactory.create()
         self.profile1, _ = Profile.objects.get_or_create(user=self.user1)
         self.client.force_login(self.user1)
         self.recipe = RecipeFactory.create()
@@ -31,13 +23,6 @@ class RecipesViews(TestCase):
             preparation=self.recipe.preparation,
             user=self.profile1,
         )
-        self.ingredient = IngredientFactory.create()
-        self.ingredient1 = Ingredient.objects.get_or_create(
-            name=self.ingredient.name,
-            quantity=self.ingredient.quantity,
-            quantity_type=self.ingredient.quantity_type,
-        )
-        self.recipe1.ingredients.add(self.ingredient1[0].id)
         self.recipe_edit_page = reverse("recipe-edit", args=[self.recipe1.id])
         self.recipe_delete_page = reverse("recipe-delete", args=[self.recipe1.id])
 
@@ -59,7 +44,6 @@ class RecipesViews(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/recipe_form.html")
 
-    @tag("x")
     def test_recipe_add_page_view_POST_correct_data(self):
         Recipe.objects.all().delete()
         Ingredient.objects.all().delete()
@@ -71,45 +55,20 @@ class RecipesViews(TestCase):
             "tags": [recipe.tags],
         }
 
-        ingredient = IngredientFactory.create()
-        recipe_data["name-0"] = ingredient.name
-        recipe_data["quantity-0"] = str(ingredient.quantity)
-        recipe_data["quantity_type-0"] = ingredient.quantity_type
-
         response = self.client.post(self.recipe_add_page, recipe_data, follow=True)
 
         self.assertEquals(Recipe.objects.count(), 1)
-        self.assertEquals(Ingredient.objects.count(), 1)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Przepis został dodany")
         self.assertRedirects(response, expected_url=self.recipes_home_page)
-
-    def test_recipe_add_page_view_POST_ingredients_not_in_form(self):
-        """
-        ingredients are not added in form
-        """
-        recipe = RecipeFactory.create()
-        recipe_data = {
-            "recipe_name": recipe.recipe_name,
-            "preparation": recipe.preparation,
-            "tags": [recipe.tags],
-        }
-        response = self.client.post(self.recipe_add_page, recipe_data, follow=True)
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Invalid data in recipe")
-        self.assertRedirects(response, expected_url=self.recipe_add_page)
 
     def test_recipe_add_page_view_POST_recipe_name_not_in_form(self):
         """
         recipe name is not inserted in form
         """
         recipe = RecipeFactory.create()
-        ingredient = IngredientFactory.create()
         recipe_data = {"preparation": recipe.preparation, "tags": [recipe.tags]}
 
-        recipe_data["name-0"] = ingredient.name
-        recipe_data["quantity-0"] = ingredient.quantity
-        recipe_data["quantity_type-0"] = ingredient.quantity_type
         response = self.client.post(self.recipe_add_page, recipe_data, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Invalid data in recipe")
@@ -120,12 +79,8 @@ class RecipesViews(TestCase):
         preparation is not inserted in form
         """
         recipe = RecipeFactory.create()
-        ingredient = IngredientFactory.create()
         recipe_data = {"recipe_name": recipe.recipe_name, "tags": [recipe.tags]}
 
-        recipe_data["name-0"] = ingredient.name
-        recipe_data["quantity-0"] = ingredient.quantity
-        recipe_data["quantity_type-0"] = ingredient.quantity_type
         response = self.client.post(self.recipe_add_page, recipe_data, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Invalid data in recipe")
@@ -145,9 +100,6 @@ class RecipesViews(TestCase):
             "recipe_name": "check_edit",
             "preparation": self.recipe.preparation,
         }
-        recipe_data["name-0"] = self.ingredient.name
-        recipe_data["quantity-0"] = self.ingredient.quantity
-        recipe_data["quantity_type-0"] = self.ingredient.quantity_type
 
         response = self.client.post(self.recipe_edit_page, recipe_data, follow=True)
         self.assertEquals(
