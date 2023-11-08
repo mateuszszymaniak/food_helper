@@ -54,12 +54,17 @@ class RecipeAddPageView(LoginRequiredMixin, View):
     def post(self, request):
         form = CreateNewRecipe(request.POST)
         if form.is_valid():
+            recipe = form.save(commit=False)
+            recipe.user = request.user.profile
+            recipe.save()
             if "add_ingredient" in request.POST:
-                recipe = form.save(commit=False)
-                recipe.user = request.user.profile
-                recipe.save()
                 return redirect("ingredient-add", recipe.id)
-        pass
+            else:
+                messages.success(request, "Przepis został dodany")
+                return redirect("recipes-home-page")
+        else:
+            messages.warning(request, "Invalid data in recipe")
+            return redirect("recipe-add")
 
 
 class RecipeEditPageView(LoginRequiredMixin, View):
