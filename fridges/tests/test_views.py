@@ -10,7 +10,6 @@ from users.models import Profile
 from ..models import Fridge
 
 
-@tag("x")
 class FridgeViews(TestCase):
     def setUp(self):
         self.fridge_home_page = reverse("fridges-home-page")

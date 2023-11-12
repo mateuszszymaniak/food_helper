@@ -5,7 +5,6 @@ from ingredients.factories import IngredientFactory
 from ..forms import NewIngredientForm
 
 
-@tag("x")
 class FridgeFormTest(TestCase):
     def test_valid_fridge_form(self):
         ingredient = IngredientFactory.create()

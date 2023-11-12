@@ -12,7 +12,6 @@ from ..factories import IngredientFactory
 from ..models import Ingredient
 
 
-# @tag('x')
 class IngredientsViews(TestCase):
     def setUp(self):
         self.user1 = UserFactory.create()

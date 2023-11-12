@@ -18,6 +18,7 @@ class FridgesHomePageView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
+# TODO pozamieniać View na EditView lub DeleteView o ile się da
 class FridgeAddPageView(LoginRequiredMixin, View):
     template_name = "fridges/fridge_form.html"
 
