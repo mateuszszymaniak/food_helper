@@ -13,12 +13,11 @@ class Fridge(models.Model):
         ("opak.", "opak."),
     )
 
-    name = models.CharField(max_length=50, null=True, blank=True)
-    quantity = models.CharField(max_length=5, null=True, blank=True)
+    name = models.CharField(max_length=50, blank=False)
+    quantity = models.CharField(max_length=5, blank=False)
     quantity_type = models.CharField(
         max_length=5,
         choices=AMOUNT_TYPE_CHOICES,
-        null=True,
-        blank=True,
+        blank=False,
     )
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="fridges")
