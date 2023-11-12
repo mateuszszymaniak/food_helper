@@ -36,12 +36,16 @@ class FridgeAddPageView(LoginRequiredMixin, View):
                 defaults={"quantity": request.POST.get("quantity")},
             )
             if not created:
-                ingredient.quantity = str(
-                    int(ingredient.quantity) + int(request.POST.get("quantity"))
+                ingredient.quantity = self.recalculate_quantity(
+                    ingredient.quantity, request.POST.get("quantity")
                 )
                 ingredient.save()
             messages.success(request, "Zawartość lodówki została dodana")
             return redirect("fridges-home-page")
+
+    def recalculate_quantity(self, quantity_from_db, quantity_from_form):
+        result = int(quantity_from_db) + int(quantity_from_form)
+        return str(result)
 
 
 class IngredientEditPageView(LoginRequiredMixin, View):
