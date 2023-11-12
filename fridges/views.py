@@ -40,7 +40,7 @@ class FridgeAddPageView(LoginRequiredMixin, View):
                     ingredient.quantity, request.POST.get("quantity")
                 )
                 ingredient.save()
-            messages.success(request, "Zawartość lodówki została dodana")
+            messages.success(request, "Ingredient has been added to fridge")
             return redirect("fridges-home-page")
 
     def recalculate_quantity(self, quantity_from_db, quantity_from_form):
@@ -68,7 +68,7 @@ class IngredientEditPageView(LoginRequiredMixin, View):
                 quantity=request.POST.get("quantity"),
                 quantity_type=request.POST.get("quantity_type"),
             )
-            messages.success(request, "Składnik został zaktualizowany")
+            messages.success(request, "Ingredient has been updated")
             return redirect("fridges-home-page")
 
 
@@ -77,5 +77,5 @@ class IngredientDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("fridges-home-page")
 
     def form_valid(self, form):
-        messages.success(self.request, "Pomyślnie usunięto składnik")
+        messages.success(self.request, "Successfully removed ingredient")
         return super().form_valid(form)

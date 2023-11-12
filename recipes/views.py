@@ -60,7 +60,7 @@ class RecipeAddPageView(LoginRequiredMixin, View):
             if "add_ingredient" in request.POST:
                 return redirect("ingredient-add", recipe.id)
             else:
-                messages.success(request, "Przepis został dodany")
+                messages.success(request, "Recipe has been added")
                 return redirect("recipes-home-page")
         else:
             messages.warning(request, "Invalid data in recipe")
@@ -92,7 +92,7 @@ class RecipeEditPageView(LoginRequiredMixin, View):
             if "add_ingredient" in request.POST:
                 return redirect("ingredients:ingredient-add", recipe_id)
             else:
-                messages.success(request, "Przepis został zaktualizowany")
+                messages.success(request, "Recipe has been updated")
                 return redirect("recipes-home-page")
         else:
             messages.warning(request, "Invalid data in recipe")
@@ -104,5 +104,5 @@ class RecipeDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy("recipes-home-page")
 
     def form_valid(self, form):
-        messages.success(self.request, "Pomyślnie usunięto przepis")
+        messages.success(self.request, "Successfully remove recipe")
         return super().form_valid(form)

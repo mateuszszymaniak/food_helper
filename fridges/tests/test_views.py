@@ -61,7 +61,7 @@ class FridgeViews(TestCase):
         response = self.client.post(self.fridge_add_page, ingredient_data, follow=True)
         self.assertEquals(Fridge.objects.count(), 1)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Zawartość lodówki została dodana")
+        self.assertContains(response, "Ingredient has been added to fridge")
         self.assertRedirects(response, expected_url=self.fridge_home_page)
 
     def test_fridge_add_page_view_POST_add_amount_to_existing_ingredient(self):
@@ -77,7 +77,7 @@ class FridgeViews(TestCase):
             str(int(self.ingredient.quantity) + int(ingredient_data.get("quantity"))),
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Zawartość lodówki została dodana")
+        self.assertContains(response, "Ingredient has been added to fridge")
         self.assertRedirects(response, expected_url=self.fridge_home_page)
 
     # endregion
@@ -102,7 +102,7 @@ class FridgeViews(TestCase):
             str(self.ingredient.quantity),
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Składnik został zaktualizowany")
+        self.assertContains(response, "Ingredient has been updated")
         self.assertRedirects(response, expected_url=self.fridge_home_page)
 
     # endregion
@@ -110,7 +110,7 @@ class FridgeViews(TestCase):
     def test_delete_fridge(self):
         response = self.client.post(self.fridge_delete, follow=True)
         self.assertEquals(Fridge.objects.count(), 0)
-        self.assertContains(response, "Pomyślnie usunięto składnik")
+        self.assertContains(response, "Successfully removed ingredient")
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, expected_url=self.fridge_home_page)
 

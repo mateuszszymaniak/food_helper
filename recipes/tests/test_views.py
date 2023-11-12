@@ -59,7 +59,7 @@ class RecipesViews(TestCase):
 
         self.assertEquals(Recipe.objects.count(), 1)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Przepis został dodany")
+        self.assertContains(response, "Recipe has been added")
         self.assertRedirects(response, expected_url=self.recipes_home_page)
 
     def test_recipe_add_page_view_POST_recipe_name_not_in_form(self):
@@ -90,7 +90,7 @@ class RecipesViews(TestCase):
     # region tests for edit view
     def test_recipe_edit_page_view_GET(self):
         response = self.client.get(self.recipe_edit_page)
-        self.assertContains(response, "Edytuj przepis!")
+        self.assertContains(response, "Edit Recipe")
         self.assertContains(response, self.recipe1.recipe_name)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/recipe_form.html")
@@ -106,7 +106,7 @@ class RecipesViews(TestCase):
             Recipe.objects.get(id=self.recipe1.id).recipe_name, "check_edit"
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Przepis został zaktualizowany")
+        self.assertContains(response, "Recipe has been updated")
         self.assertRedirects(response, expected_url=self.recipes_home_page)
 
     # endregion

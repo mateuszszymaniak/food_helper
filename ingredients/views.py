@@ -26,7 +26,7 @@ class IngredientAddView(LoginRequiredMixin, View):
             recipe = Recipe.objects.get(id=recipe_id)
             ingredient = form.save()
             recipe.ingredients.add(ingredient.id)
-            messages.success(self.request, "Pomyślnie dodano składnik")
+            messages.success(self.request, "Successfully added ingredient")
             return redirect("recipe-edit", recipe_id)
         else:
             messages.warning(request, "Invalid data in ingredient")
@@ -50,7 +50,7 @@ class IngredientEditView(LoginRequiredMixin, View):
                 quantity=request.POST.get("quantity"),
                 quantity_type=request.POST.get("quantity_type"),
             )
-            messages.success(self.request, "Pomyślnie edytowano składnik")
+            messages.success(self.request, "Successfully edited ingredient")
             return redirect("recipe-edit", recipe_id)
         else:
             messages.warning(request, "Invalid data in ingredient")
@@ -67,5 +67,5 @@ class IngredientDeleteView(LoginRequiredMixin, DeleteView):
         return success_url
 
     def form_valid(self, form):
-        messages.success(self.request, "Pomyślnie usunięto składnik")
+        messages.success(self.request, "Successfully removed ingredient")
         return super().form_valid(form)

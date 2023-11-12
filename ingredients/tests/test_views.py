@@ -61,7 +61,7 @@ class IngredientsViews(TestCase):
 
         self.assertEquals(Ingredient.objects.count(), 2)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Pomyślnie dodano składnik")
+        self.assertContains(response, "Successfully added ingredient")
         self.assertRedirects(response, expected_url=self.recipe_edit_page)
 
     def test_ingredient_add_page_view_POST_missing_ingredient_name(self):
@@ -125,7 +125,7 @@ class IngredientsViews(TestCase):
             Ingredient.objects.get(id=self.ingredient.id).name, "new_name"
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Pomyślnie edytowano składnik")
+        self.assertContains(response, "Successfully edited ingredient")
         self.assertRedirects(response, expected_url=self.recipe_edit_page)
 
     # endregion
@@ -134,6 +134,6 @@ class IngredientsViews(TestCase):
         response = self.client.post(self.ingredient_delete_page, follow=True)
 
         self.assertEquals(Ingredient.objects.count(), 0)
-        self.assertContains(response, "Pomyślnie usunięto składnik")
+        self.assertContains(response, "Successfully removed ingredient")
 
     # endregion
