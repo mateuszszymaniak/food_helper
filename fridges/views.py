@@ -42,6 +42,9 @@ class FridgeAddPageView(LoginRequiredMixin, View):
                 ingredient.save()
             messages.success(request, "Ingredient has been added to fridge")
             return redirect("fridges-home-page")
+        else:
+            messages.warning(request, "Invalid data in ingredient")
+            return redirect("fridge-add")
 
     def recalculate_quantity(self, quantity_from_db, quantity_from_form):
         result = int(quantity_from_db) + int(quantity_from_form)
@@ -70,6 +73,9 @@ class IngredientEditPageView(LoginRequiredMixin, View):
             )
             messages.success(request, "Ingredient has been updated")
             return redirect("fridges-home-page")
+        else:
+            messages.warning(request, "Invalid data in ingredient")
+            return redirect("fridge-edit", ingredient_id)
 
 
 class IngredientDeleteView(LoginRequiredMixin, DeleteView):
