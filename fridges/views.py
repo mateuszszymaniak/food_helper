@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DeleteView
 
+from .forms import NewIngredientForm
 from .models import Fridge
 
 
@@ -21,32 +22,26 @@ class FridgeAddPageView(LoginRequiredMixin, View):
     template_name = "fridges/fridge_form.html"
 
     def get(self, request):
-        context = {"title": "Add Ingredient"}
+        form = NewIngredientForm()
+        context = {"title": "Add Ingredient", "form": form}
         return render(request, self.template_name, context)
 
     def post(self, request):
-        form = request.POST
-        ingredients_list = list(filter(lambda key: key.startswith("quantity-"), form))
-        for prefix in ingredients_list:
-            quantity = form.get(prefix)
-            name = form.get(f"{prefix.replace('quantity', 'name')}")
-            quantity_type = form.get(f"{prefix.replace('quantity', 'quantity_type')}")
-            try:
-                ingredient = Fridge.objects.get(
-                    name=name, quantity_type=quantity_type, user=request.user.profile
+        form = NewIngredientForm(request.POST)
+        if form.is_valid():
+            ingredient, created = Fridge.objects.get_or_create(
+                name=request.POST.get("name"),
+                quantity_type=request.POST.get("quantity_type"),
+                user=request.user.profile,
+                defaults={"quantity": request.POST.get("quantity")},
+            )
+            if not created:
+                ingredient.quantity = str(
+                    int(ingredient.quantity) + int(request.POST.get("quantity"))
                 )
-                ingredient.quantity = int(ingredient.quantity) + int(quantity)
                 ingredient.save()
-            except Fridge.DoesNotExist:
-                Fridge.objects.create(
-                    name=name,
-                    quantity=quantity,
-                    quantity_type=quantity_type,
-                    user=request.user.profile,
-                )
-
-        messages.success(request, "Zawartość lodówki została dodana")
-        return redirect("fridges-home-page")
+            messages.success(request, "Zawartość lodówki została dodana")
+            return redirect("fridges-home-page")
 
 
 class IngredientEditPageView(LoginRequiredMixin, View):
@@ -54,17 +49,19 @@ class IngredientEditPageView(LoginRequiredMixin, View):
 
     def get(self, request, ingredient_id):
         ingredient = get_object_or_404(Fridge, pk=ingredient_id)
-        context = {"ingredient": ingredient}
+        context = {"ingredient": ingredient, "form": ingredient}
         return render(request, self.template_name, context)
 
     def post(self, request, ingredient_id):
-        ingredient = Fridge.objects.get(id=ingredient_id)
-        ingredient.quantity = request.POST.get("quantity-0")
-        ingredient.quantity_type = request.POST.get("quantity_type-0")
-        ingredient.name = request.POST.get("name-0")
-        ingredient.save()
-        messages.success(request, "Składnik został zaktualizowany")
-        return redirect("fridges-home-page")
+        form = NewIngredientForm(request.POST)
+        if form.is_valid():
+            Fridge.objects.filter(id=ingredient_id).update(
+                name=request.POST.get("name"),
+                quantity=request.POST.get("quantity"),
+                quantity_type=request.POST.get("quantity_type"),
+            )
+            messages.success(request, "Składnik został zaktualizowany")
+            return redirect("fridges-home-page")
 
 
 class IngredientDeleteView(LoginRequiredMixin, DeleteView):

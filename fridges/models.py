@@ -3,7 +3,6 @@ from django.db import models
 from users.models import Profile
 
 
-# Create your models here.
 class Fridge(models.Model):
     AMOUNT_TYPE_CHOICES = (
         ("kg", "kg"),
@@ -14,7 +13,7 @@ class Fridge(models.Model):
         ("opak.", "opak."),
     )
 
-    name = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    name = models.CharField(max_length=50, null=True, blank=True)
     quantity = models.CharField(max_length=5, null=True, blank=True)
     quantity_type = models.CharField(
         max_length=5,
