@@ -10,6 +10,7 @@ from users.models import Profile
 from ..models import Fridge
 
 
+@tag("x")
 class FridgeViews(TestCase):
     def setUp(self):
         self.fridge_home_page = reverse("fridges-home-page")
@@ -80,6 +81,36 @@ class FridgeViews(TestCase):
         self.assertContains(response, "Ingredient has been added to fridge")
         self.assertRedirects(response, expected_url=self.fridge_home_page)
 
+    def test_fridge_add_page_view_POST_missing_name_in_form(self):
+        ingredient_data = {
+            "quantity": self.ingredient.quantity,
+            "quantity_type": self.ingredient.quantity_type,
+        }
+        response = self.client.post(self.fridge_add_page, ingredient_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Invalid data in ingredient")
+        self.assertRedirects(response, expected_url=self.fridge_add_page)
+
+    def test_fridge_add_page_view_POST_missing_quantity_in_form(self):
+        ingredient_data = {
+            "name": self.ingredient.name,
+            "quantity_type": self.ingredient.quantity_type,
+        }
+        response = self.client.post(self.fridge_add_page, ingredient_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Invalid data in ingredient")
+        self.assertRedirects(response, expected_url=self.fridge_add_page)
+
+    def test_fridge_add_page_view_POST_missing_quantity_type_in_form(self):
+        ingredient_data = {
+            "name": self.ingredient.name,
+            "quantity": self.ingredient.quantity,
+        }
+        response = self.client.post(self.fridge_add_page, ingredient_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Invalid data in ingredient")
+        self.assertRedirects(response, expected_url=self.fridge_add_page)
+
     # endregion
     # region tests for edit view
     def test_fridge_edit_page_view_GET(self):
@@ -88,8 +119,7 @@ class FridgeViews(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "fridges/fridge_form.html")
 
-    @tag("x")
-    def test_fridge_edit_page_view_POST(self):
+    def test_fridge_edit_page_view_POST_correct_data(self):
         ingredient_data = {
             "name": "ing1_edit",
             "quantity": self.ingredient.quantity,
