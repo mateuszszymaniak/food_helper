@@ -8,7 +8,6 @@ from users.models import Profile, User
 HOME_PAGE = "home-page"
 
 
-# @tag('x')
 class TestViews(TestCase):
     def setUp(self):
         self.home_page = reverse("home-page")

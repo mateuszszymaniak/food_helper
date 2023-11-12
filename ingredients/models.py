@@ -1,9 +1,7 @@
 from django.db import models
 
-from users.models import Profile
 
-
-class Fridge(models.Model):
+class Ingredient(models.Model):
     AMOUNT_TYPE_CHOICES = (
         ("kg", "kg"),
         ("g", "g"),
@@ -13,11 +11,10 @@ class Fridge(models.Model):
         ("opak.", "opak."),
     )
 
-    name = models.CharField(max_length=50, blank=False)
-    quantity = models.CharField(max_length=5, blank=False)
+    name = models.CharField(max_length=50)
+    quantity = models.CharField(max_length=5)
     quantity_type = models.CharField(
         max_length=5,
         choices=AMOUNT_TYPE_CHOICES,
-        blank=False,
     )
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="fridges")
+    # TODO add user in future
