@@ -73,7 +73,11 @@ class RecipeEditPageView(LoginRequiredMixin, View):
     def get(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         ingredients = recipe.ingredients.all()
-        context = {"form": recipe, "ingredient_form": ingredients}
+        context = {
+            "title": "Edit Recipe",
+            "form": recipe,
+            "ingredient_form": ingredients,
+        }
 
         return render(request, self.template_name, context)
 

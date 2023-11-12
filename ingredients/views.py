@@ -16,7 +16,7 @@ class IngredientAddView(LoginRequiredMixin, View):
 
     def get(self, request, recipe_id):
         form = IngredientsForm()
-        context = {"title": "Add Ingredient", "form": form}
+        context = {"title": "Add Recipe Ingredient", "form": form}
 
         return render(request, self.template_name, context)
 
@@ -38,7 +38,7 @@ class IngredientEditView(LoginRequiredMixin, View):
 
     def get(self, request, recipe_id, ingredient_id):
         ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
-        context = {"form": ingredient}
+        context = {"title": "Edit Recipe Ingredient", "form": ingredient}
 
         return render(request, self.template_name, context)
 

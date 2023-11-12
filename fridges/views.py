@@ -23,7 +23,7 @@ class FridgeAddPageView(LoginRequiredMixin, View):
 
     def get(self, request):
         form = NewIngredientForm()
-        context = {"title": "Add Ingredient", "form": form}
+        context = {"title": "Add Fridge Ingredient", "form": form}
         return render(request, self.template_name, context)
 
     def post(self, request):
@@ -53,7 +53,11 @@ class IngredientEditPageView(LoginRequiredMixin, View):
 
     def get(self, request, ingredient_id):
         ingredient = get_object_or_404(Fridge, pk=ingredient_id)
-        context = {"ingredient": ingredient, "form": ingredient}
+        context = {
+            "title": "Edit Fridge Ingredient",
+            "ingredient": ingredient,
+            "form": ingredient,
+        }
         return render(request, self.template_name, context)
 
     def post(self, request, ingredient_id):
