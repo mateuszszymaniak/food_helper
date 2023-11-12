@@ -16,7 +16,6 @@ from ..models import Ingredient
 class IngredientsViews(TestCase):
     def setUp(self):
         self.user1 = UserFactory.create()
-        self.user1.save()
         self.profile1, _ = Profile.objects.get_or_create(user=self.user1)
         self.client.force_login(self.user1)
         self.ingredient_factory = IngredientFactory.create()
