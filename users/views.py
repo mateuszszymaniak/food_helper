@@ -92,6 +92,8 @@ class HomePageView(View):
 
         for recipe in user_recipes:
             ingredients = recipe.ingredients.all()
+            if len(ingredients) == 0:
+                break
             missing_ingredients_counter = 0
             for ingredient_item in ingredients:
                 ingredient_name = ingredient_item.name
