@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
@@ -58,7 +57,7 @@ class RecipeAddPageView(LoginRequiredMixin, View):
             recipe.user = request.user.profile
             recipe.save()
             if "add_ingredient" in request.POST:
-                return redirect("ingredient-add", recipe.id)
+                return redirect("ingredients:ingredient-add", recipe.id)
             else:
                 messages.success(request, "Recipe has been added")
                 return redirect("recipes-home-page")
@@ -96,7 +95,7 @@ class RecipeEditPageView(LoginRequiredMixin, View):
                 return redirect("recipes-home-page")
         else:
             messages.warning(request, "Invalid data in recipe")
-            return redirect("recipe-edit")
+            return redirect("recipe-edit", recipe_id)
 
 
 class RecipeDeleteView(LoginRequiredMixin, DeleteView):

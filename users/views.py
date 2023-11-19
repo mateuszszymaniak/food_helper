@@ -1,21 +1,14 @@
-from datetime import datetime
-
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
-from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from fridges.models import Fridge
-from recipes.models import Ingredient, Recipe
-
 from .forms import MyResetPasswordForm, UserRegisterForm
-from .models import Profile
 
 
 class CustomAuthForm(AuthenticationForm):
@@ -54,21 +47,7 @@ class MyResetPasswordView(PasswordResetView):
 class MyLoginView(LoginView):
     redirect_authenticated_user = True
     form_class = CustomAuthForm
-
-    def form_invalid(self, form):
-        if self.request.method == "POST":
-            username = form.data.get("username")
-            password = form.data.get("password")
-            user_exist = (
-                get_user_model()
-                .objects.filter(Q(username=username) & Q(password=password))
-                .exists()
-            )
-            if user_exist:
-                Profile.objects.filter(user=user_exist)
-                return redirect("home-page")
-        messages.warning(self.request, "Incorrect login or password")
-        return redirect("login-page")
+    success_url = reverse_lazy("users/home.html")
 
 
 class HomePageView(View):
@@ -93,16 +72,18 @@ class HomePageView(View):
         for recipe in user_recipes:
             ingredients = recipe.ingredients.all()
             if len(ingredients) == 0:
-                break
+                continue
             missing_ingredients_counter = 0
             for ingredient_item in ingredients:
                 ingredient_name = ingredient_item.name
                 ingredient_quantity = int(ingredient_item.quantity)
+                ingredient_quantity_type = ingredient_item.quantity_type
                 ingredient_found = False
                 for fridge_item in fridge:
                     if (
                         ingredient_name == fridge_item.name
                         and ingredient_quantity <= int(fridge_item.quantity)
+                        and ingredient_quantity_type == fridge_item.quantity_type
                     ):
                         ingredient_found = True
                         break
@@ -135,26 +116,6 @@ class RegisterView(View):
                 return redirect("login-page")
         messages.warning(request, "Form have invalid data")
         return redirect("register-page")
-
-
-class ResetPasswordView(View):
-    template_name = "users/reset_password.html"
-    form = MyResetPasswordForm()
-    context = {"title": "Reset Password", "form": form}
-
-    def get(self, request):
-        return render(request, self.template_name, self.context)
-
-    @staticmethod
-    def post(request):
-        form = MyResetPasswordForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Password successfully reseted")
-            return redirect("login-page")
-        else:
-            messages.warning(request, "Form have invalid data")
-            return redirect("reset-password-page")
 
 
 class ProfileView(View):

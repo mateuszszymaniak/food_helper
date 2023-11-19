@@ -3,6 +3,7 @@ from http import HTTPStatus
 from django.test import TestCase, tag
 from django.urls import reverse
 
+from ingredients.factories import IngredientFactory
 from users.factories import UserFactory
 from users.models import Profile
 
@@ -23,6 +24,13 @@ class RecipesViews(TestCase):
             preparation=self.recipe.preparation,
             user=self.profile1,
         )
+        self.ingredient = IngredientFactory.create()
+        self.ingredient1 = Ingredient.objects.create(
+            name=self.ingredient.name,
+            quantity=self.ingredient.quantity,
+            quantity_type=self.ingredient.quantity_type,
+        )
+        self.recipe1.ingredients.add(self.ingredient1)
         self.recipe_edit_page = reverse("recipe-edit", args=[self.recipe1.id])
         self.recipe_delete_page = reverse("recipe-delete", args=[self.recipe1.id])
 
@@ -37,12 +45,46 @@ class RecipesViews(TestCase):
         self.assertTemplateUsed(response, "recipes/home.html")
         self.assertContains(response, "Add recipe")
 
+    def test_recipe_home_page_view_GET_with_recipe_with_ingredient(self):
+        self.client.force_login(self.user1)
+        response = self.client.get(self.recipes_home_page)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertTemplateUsed(response, "recipes/home.html")
+        self.assertContains(
+            response, Recipe.objects.get(id=self.recipe1.id).recipe_name
+        )
+        self.assertContains(
+            response, Ingredient.objects.get(id=self.ingredient1.id).name
+        )
+
     # endregion
     # region tests for add view
     def test_recipe_add_page_view_GET(self):
         response = self.client.get(self.recipe_add_page)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/recipe_form.html")
+
+    def test_recipe_add_page_view_POST_add_ingredient(self):
+        form_data = {
+            "recipe_name": "q",
+            "preparation": "q",
+            "tags": "",
+            "add_ingredient": "",
+        }
+        response = self.client.post(self.recipe_add_page, form_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertTemplateUsed(response, "ingredients/ingredient_form.html")
+
+    def test_recipe_edit_page_view_POST_add_ingredient(self):
+        form_data = {
+            "recipe_name": "q",
+            "preparation": "q",
+            "tags": "",
+            "add_ingredient": "",
+        }
+        response = self.client.post(self.recipe_edit_page, form_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertTemplateUsed(response, "ingredients/ingredient_form.html")
 
     def test_recipe_add_page_view_POST_correct_data(self):
         Recipe.objects.all().delete()
@@ -108,6 +150,16 @@ class RecipesViews(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Recipe has been updated")
         self.assertRedirects(response, expected_url=self.recipes_home_page)
+
+    def test_recipe_edit_page_view_POST_incorrect_data(self):
+        recipe_data = {
+            "recipe_name": "check_edit",
+        }
+
+        response = self.client.post(self.recipe_edit_page, recipe_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Invalid data in recipe")
+        self.assertRedirects(response, expected_url=self.recipe_edit_page)
 
     # endregion
     # region tests for delete view

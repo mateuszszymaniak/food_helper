@@ -1,6 +1,5 @@
 from django.test import TestCase, tag
 
-from ..factories import UserFactory
 from ..forms import UserRegisterForm
 
 

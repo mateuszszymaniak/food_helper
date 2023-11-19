@@ -134,6 +134,15 @@ class FridgeViews(TestCase):
         self.assertContains(response, "Ingredient has been updated")
         self.assertRedirects(response, expected_url=self.fridge_home_page)
 
+    def test_fridge_edit_page_view_POST_incorrect_data(self):
+        ingredient_data = {
+            "name": "ing1_edit",
+        }
+        response = self.client.post(self.fridge_edit, ingredient_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Invalid data in ingredient")
+        self.assertRedirects(response, expected_url=self.fridge_edit)
+
     # endregion
     # region tests for delete view
     def test_delete_fridge(self):

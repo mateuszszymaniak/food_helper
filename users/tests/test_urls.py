@@ -1,4 +1,3 @@
-from django.contrib.auth import views as auth_views
 from django.test import SimpleTestCase
 from django.urls import resolve, reverse
 

@@ -54,7 +54,7 @@ class IngredientEditView(LoginRequiredMixin, View):
             return redirect("recipe-edit", recipe_id)
         else:
             messages.warning(request, "Invalid data in ingredient")
-            return redirect("ingredients:ingredient-edit", recipe_id)
+            return redirect("ingredients:ingredient-edit", recipe_id, ingredient_id)
 
 
 class IngredientDeleteView(LoginRequiredMixin, DeleteView):
