@@ -3,11 +3,16 @@ from http import HTTPStatus
 from django.test import TestCase, tag
 from django.urls import reverse
 
+from fridges.models import Fridge
+from ingredients.models import Ingredient
+from recipes.models import Recipe
 from users.models import Profile, User
+from users.views import HomePageView
 
 HOME_PAGE = "home-page"
 
 
+@tag("x")
 class TestViews(TestCase):
     def setUp(self):
         self.home_page = reverse("home-page")
@@ -18,12 +23,13 @@ class TestViews(TestCase):
         self.user_username = "user1"
         self.user_password = "pass1!"  # nosec bandit B105
         self.user_email = "email@email.pl"
-        self.user1 = User.objects.create(
+        self.user1 = User.objects.create_user(
             username=self.user_username,
             email=self.user_email,
+            password=self.user_password,
         )
-        self.user1.set_password(self.user_password)
-        self.user1.save()
+        # self.user1.set_password(self.user_password)
+        # self.user1.save()
         self.profile1 = Profile.objects.get(user=self.user1)
 
     # region tests for home view
@@ -51,36 +57,155 @@ class TestViews(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "users/login.html")
 
+    def test_home_page_view_GET_recipe_without_fridge(self):
+        ingredient1 = Ingredient.objects.create(
+            name="qwe",
+            quantity="1",
+            quantity_type="kg",
+        )
+        ingredient2 = Ingredient.objects.create(
+            name="zxc",
+            quantity="2",
+            quantity_type="l",
+        )
+        recipe = Recipe.objects.create(
+            recipe_name="new_recipe",
+            preparation="new_prep",
+            user=self.profile1,
+        )
+        recipe.ingredients.add(ingredient1)
+        recipe.ingredients.add(ingredient2)
+        self.client.force_login(self.user1)
+        response = self.client.get(self.home_page)
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Missing ingredients in recipes: 2")
+
+    def test_home_page_view_GET_recipe_without_ingredients(self):
+        Recipe.objects.create(
+            recipe_name="new_recipe",
+            preparation="new_prep",
+            user=self.profile1,
+        )
+        self.client.force_login(self.user1)
+        response = self.client.get(self.home_page)
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertFalse("Recipes, which can be done" in response)
+        self.assertFalse("Missing ingredients in recipes: " in response)
+
+    def test_home_page_view_GET_recipe_with_ingredient_in_fridge(self):
+        ingredient1 = Ingredient.objects.create(
+            name="qwe",
+            quantity="1",
+            quantity_type="kg",
+        )
+        recipe = Recipe.objects.create(
+            recipe_name="new_recipe",
+            preparation="new_prep",
+            user=self.profile1,
+        )
+        Fridge.objects.create(
+            name="qwe",
+            quantity="1",
+            quantity_type="kg",
+            user=self.profile1,
+        )
+        recipe.ingredients.add(ingredient1)
+        self.client.force_login(self.user1)
+        response = self.client.get(self.home_page)
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Recipes, which can be done")
+
+    def test_home_page_view_GET_with_two_recipes(self):
+        recipe1 = Recipe.objects.create(
+            recipe_name="new_recipe",
+            preparation="new_prep",
+            user=self.profile1,
+        )
+        ingredient1 = Ingredient.objects.create(
+            name="qwe",
+            quantity="1",
+            quantity_type="kg",
+        )
+        recipe2 = Recipe.objects.create(
+            recipe_name="new_recipe_2",
+            preparation="new_prep_2",
+            user=self.profile1,
+        )
+        ingredient2 = Ingredient.objects.create(
+            name="qwer",
+            quantity="12",
+            quantity_type="g",
+        )
+        recipe1.ingredients.add(ingredient1)
+        recipe2.ingredients.add(ingredient2)
+
+        home_page_view_instance = HomePageView()
+        result = home_page_view_instance.ready_recipes(
+            Recipe.objects.all(), Fridge.objects.all()
+        )
+        self.assertEquals(result, ({"1": [recipe1, recipe2]}, ["1"]))
+
+    def test_home_page_view_GET_recipe_with_ingredient_in_fridge_with_different_quantity_type(
+        self,
+    ):
+        ingredient1 = Ingredient.objects.create(
+            name="qwe",
+            quantity="1",
+            quantity_type="g",
+        )
+        recipe = Recipe.objects.create(
+            recipe_name="new_recipe",
+            preparation="new_prep",
+            user=self.profile1,
+        )
+        Fridge.objects.create(
+            name="qwe",
+            quantity="1",
+            quantity_type="kg",
+            user=self.profile1,
+        )
+        recipe.ingredients.add(ingredient1)
+        self.client.force_login(self.user1)
+        response = self.client.get(self.home_page)
+
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertFalse("Recipes, which can be done" in response)
+        self.assertContains(response, "Missing ingredients in recipes:")
+
     def test_login_page_view_POST_incorrect_credentials(self):
         """
         username and password are incorrect
         """
-        login_data = {"username": "", "password": ""}
+        login_data = {"username": "zxc", "password": "z"}
         response = self.client.post(self.login_page, login_data)
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
-        self.assertRedirects(response, expected_url=self.login_page)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Wrong email or password")
 
         """
         username is correct, password incorrect
         """
         login_data = {"username": "user1", "password": "test_pass"}
         response = self.client.post(self.login_page, login_data)
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
-        self.assertRedirects(response, expected_url=self.login_page)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Wrong email or password")
 
         """
         username is incorrect, password is correct
         """
         login_data = {"username": "test_user", "password": "pass1!"}
         response = self.client.post(self.login_page, login_data)
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
-        self.assertRedirects(response, expected_url=self.login_page)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Wrong email or password")
 
     def test_login_page_view_POST_correct_credentials(self):
-        login_data = {"username": "user1", "password": "pass1!"}
-        response = self.client.post(self.login_page, login_data)
-        self.assertEquals(response.status_code, HTTPStatus.FOUND)
+        login_data = {"username": self.user_username, "password": self.user_password}
+        response = self.client.post(self.login_page, login_data, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, expected_url=self.home_page)
+        self.assertTrue(self.user1.is_authenticated)
 
     # endregion
     # region tests for register view
@@ -146,6 +271,7 @@ class TestViews(TestCase):
 
     # endregion
     # region tests for reset_password view
+
     def test_reset_password_page_view_GET(self):
         response = self.client.get(self.reset_password_page)
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -185,6 +311,16 @@ class TestViews(TestCase):
         response = self.client.post(self.reset_password_page, reset_password_data)
         self.assertEquals(response.status_code, HTTPStatus.FOUND)
         self.assertRedirects(response, expected_url=self.reset_password_page)
+
+        """
+        form missing data
+        """
+        reset_password_data = {
+            "email": "email@email.pl",
+        }
+        response = self.client.post(self.reset_password_page, reset_password_data)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertTemplateUsed(response, "users/reset_password.html")
 
     # endregion
     # region tests for profile view
