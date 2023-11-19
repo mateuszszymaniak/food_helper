@@ -83,11 +83,13 @@ class HomePageView(View):
             for ingredient_item in ingredients:
                 ingredient_name = ingredient_item.name
                 ingredient_quantity = int(ingredient_item.quantity)
+                ingredient_quantity_type = ingredient_item.quantity_type
                 ingredient_found = False
                 for fridge_item in fridge:
                     if (
                         ingredient_name == fridge_item.name
                         and ingredient_quantity <= int(fridge_item.quantity)
+                        and ingredient_quantity_type == fridge_item.quantity_type
                     ):
                         ingredient_found = True
                         break
