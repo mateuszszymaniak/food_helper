@@ -55,21 +55,6 @@ class MyLoginView(LoginView):
     redirect_authenticated_user = True
     form_class = CustomAuthForm
 
-    def form_invalid(self, form):
-        if self.request.method == "POST":
-            username = form.data.get("username")
-            password = form.data.get("password")
-            user_exist = (
-                get_user_model()
-                .objects.filter(Q(username=username) & Q(password=password))
-                .exists()
-            )
-            if user_exist:
-                Profile.objects.filter(user=user_exist)
-                return redirect("home-page")
-        messages.warning(self.request, "Incorrect login or password")
-        return redirect("login-page")
-
 
 class HomePageView(View):
     template_name = "users/home.html"
