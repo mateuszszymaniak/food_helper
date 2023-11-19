@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
@@ -54,6 +54,7 @@ class MyResetPasswordView(PasswordResetView):
 class MyLoginView(LoginView):
     redirect_authenticated_user = True
     form_class = CustomAuthForm
+    success_url = reverse_lazy("users/home.html")
 
 
 class HomePageView(View):
