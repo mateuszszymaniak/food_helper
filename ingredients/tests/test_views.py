@@ -127,6 +127,18 @@ class IngredientsViews(TestCase):
         self.assertContains(response, "Successfully edited ingredient")
         self.assertRedirects(response, expected_url=self.recipe_edit_page)
 
+    def test_ingredient_edit_page_view_POST_incorrect_data(self):
+        ingredient_data = {
+            "name": "new_name",
+        }
+
+        response = self.client.post(
+            self.ingredient_edit_page, ingredient_data, follow=True
+        )
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Invalid data in ingredient")
+        self.assertRedirects(response, expected_url=self.ingredient_edit_page)
+
     # endregion
     # region tests for delete view
     def test_ingredient_delete(self):
