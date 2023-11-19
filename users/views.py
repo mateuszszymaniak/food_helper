@@ -1,21 +1,14 @@
-from datetime import datetime
-
 from django.contrib import messages
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
-from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from fridges.models import Fridge
-from recipes.models import Ingredient, Recipe
-
 from .forms import MyResetPasswordForm, UserRegisterForm
-from .models import Profile
 
 
 class CustomAuthForm(AuthenticationForm):
