@@ -122,26 +122,6 @@ class RegisterView(View):
         return redirect("register-page")
 
 
-class ResetPasswordView(View):
-    template_name = "users/reset_password.html"
-    form = MyResetPasswordForm()
-    context = {"title": "Reset Password", "form": form}
-
-    def get(self, request):
-        return render(request, self.template_name, self.context)
-
-    @staticmethod
-    def post(request):
-        form = MyResetPasswordForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Password successfully reseted")
-            return redirect("login-page")
-        else:
-            messages.warning(request, "Form have invalid data")
-            return redirect("reset-password-page")
-
-
 class ProfileView(View):
     template_name = "users/profile.html"
     context = {"title": "Profile"}
