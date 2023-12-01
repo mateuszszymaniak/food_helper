@@ -2,18 +2,19 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views import View
-from django.views.generic import DeleteView
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from .forms import CreateNewRecipe
 from .models import Recipe
 
 
-class RecipesHomePageView(LoginRequiredMixin, View):
+class RecipesHomePageView(LoginRequiredMixin, ListView):
+    model = Recipe
     template_name = "recipes/home.html"
+    extra_context = {"title": "Recipes"}
 
-    def get(self, request):
-        user_recipes = Recipe.objects.filter(user=request.user.pk).order_by("id")
+    def get(self, request, *args, **kwargs):
+        user_recipes = self.model.objects.filter(user=request.user.pk).order_by("id")
         recipes_with_ingredients = []
         for recipe in user_recipes:
             recipe_data = {
@@ -34,24 +35,24 @@ class RecipesHomePageView(LoginRequiredMixin, View):
                 }
                 recipe_data["ingredients"].append(ingredient_data)
             recipes_with_ingredients.append(recipe_data)
-        context = {
-            "title": "Recipes",
-            "recipes": recipes_with_ingredients,
-        }
+        context = self.extra_context
+        context["recipes"] = recipes_with_ingredients
         return render(request, self.template_name, context)
 
 
-class RecipeAddPageView(LoginRequiredMixin, View):
+class RecipeAddPageView(LoginRequiredMixin, CreateView):
+    model = Recipe
+    form_class = CreateNewRecipe
     template_name = "recipes/recipe_form.html"
+    extra_context = {"title": "Add Recipe"}
 
-    def get(self, request):
-        form = CreateNewRecipe()
-        context = {"title": "Add Recipe", "form": form}
-
+    def get(self, request, *args, **kwargs):
+        context = self.extra_context
+        context["form"] = self.form_class
         return render(request, self.template_name, context)
 
-    def post(self, request):
-        form = CreateNewRecipe(request.POST)
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
         if form.is_valid():
             recipe = form.save(commit=False)
             recipe.user = request.user.profile
@@ -66,27 +67,29 @@ class RecipeAddPageView(LoginRequiredMixin, View):
             return redirect("recipe-add")
 
 
-class RecipeEditPageView(LoginRequiredMixin, View):
+class RecipeEditPageView(LoginRequiredMixin, UpdateView):
+    model = Recipe
+    form_class = CreateNewRecipe
     template_name = "recipes/recipe_form.html"
+    extra_context = {"title": "Edit Recipe"}
 
-    def get(self, request, recipe_id):
-        recipe = get_object_or_404(Recipe, pk=recipe_id)
+    def get(self, request, *args, **kwargs):
+        recipe_id = kwargs.get("recipe_id")
+        recipe = get_object_or_404(self.model, pk=recipe_id)
         ingredients = recipe.ingredients.all()
-        context = {
-            "title": "Edit Recipe",
-            "form": recipe,
-            "ingredient_form": ingredients,
-        }
-
+        context = self.extra_context
+        context["form"] = recipe
+        context["ingredient_form"] = ingredients
         return render(request, self.template_name, context)
 
-    def post(self, request, recipe_id):
-        form = CreateNewRecipe(request.POST)
+    def post(self, request, *args, **kwargs):
+        recipe_id = kwargs.get("recipe_id")
+        form = self.form_class(request.POST)
         if form.is_valid():
-            Recipe.objects.filter(id=recipe_id).update(
-                recipe_name=request.POST.get("recipe_name"),
-                preparation=request.POST.get("preparation"),
-                tags=[request.POST.get("tags")],
+            self.model.objects.filter(id=recipe_id).update(
+                recipe_name=form.cleaned_data.get("recipe_name"),
+                preparation=form.cleaned_data.get("preparation"),
+                tags=[form.cleaned_data.get("tags")],
             )
             if "add_ingredient" in request.POST:
                 return redirect("ingredients:ingredient-add", recipe_id)

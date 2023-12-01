@@ -2,8 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views import View
-from django.views.generic import DeleteView
+from django.views.generic import CreateView, DeleteView, UpdateView
 
 from recipes.models import Recipe
 
@@ -11,17 +10,20 @@ from .forms import IngredientsForm
 from .models import Ingredient
 
 
-class IngredientAddView(LoginRequiredMixin, View):
+class IngredientAddView(LoginRequiredMixin, CreateView):
+    model = Ingredient
+    form_class = IngredientsForm
     template_name = "ingredients/ingredient_form.html"
+    extra_context = {"title": "Add Recipe Ingredient"}
 
-    def get(self, request, recipe_id):
-        form = IngredientsForm()
-        context = {"title": "Add Recipe Ingredient", "form": form}
-
+    def get(self, request, *args, **kwargs):
+        context = self.extra_context
+        context["form"] = self.form_class
         return render(request, self.template_name, context)
 
-    def post(self, request, recipe_id):
-        form = IngredientsForm(request.POST)
+    def post(self, request, *args, **kwargs):
+        recipe_id = kwargs.get("recipe_id")
+        form = self.form_class(request.POST)
         if form.is_valid():
             recipe = Recipe.objects.get(id=recipe_id)
             ingredient = form.save()
@@ -33,22 +35,28 @@ class IngredientAddView(LoginRequiredMixin, View):
             return redirect("ingredients:ingredient-add", recipe_id)
 
 
-class IngredientEditView(LoginRequiredMixin, View):
+class IngredientEditView(LoginRequiredMixin, UpdateView):
+    model = Ingredient
+    form_class = IngredientsForm
     template_name = "ingredients/ingredient_form.html"
+    extra_context = {"title": "Edit Recipe Ingredient"}
 
-    def get(self, request, recipe_id, ingredient_id):
+    def get(self, request, *args, **kwargs):
+        ingredient_id = kwargs.get("ingredient_id")
         ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
-        context = {"title": "Edit Recipe Ingredient", "form": ingredient}
-
+        context = self.extra_context
+        context["form"] = ingredient
         return render(request, self.template_name, context)
 
-    def post(self, request, recipe_id, ingredient_id):
-        form = IngredientsForm(request.POST)
+    def post(self, request, *args, **kwargs):
+        ingredient_id = kwargs.get("ingredient_id")
+        recipe_id = kwargs.get("recipe_id")
+        form = self.form_class(request.POST)
         if form.is_valid():
-            Ingredient.objects.filter(id=ingredient_id).update(
-                name=request.POST.get("name"),
-                quantity=request.POST.get("quantity"),
-                quantity_type=request.POST.get("quantity_type"),
+            self.model.objects.filter(id=ingredient_id).update(
+                name=form.cleaned_data.get("name"),
+                quantity=form.cleaned_data.get("quantity"),
+                quantity_type=form.cleaned_data.get("quantity_type"),
             )
             messages.success(self.request, "Successfully edited ingredient")
             return redirect("recipe-edit", recipe_id)
