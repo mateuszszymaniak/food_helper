@@ -13,21 +13,22 @@
             </div>
 
             Ingredient
+            {% if form.ingredients.count > 0 %}
             <table id="ingredient-table" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <td>Quantity</td>
+                        <td>Amount</td>
                         <td>Quantity type</td>
-                        <td>Name</td>
+                        <td>Product</td>
                         <td></td>
                     </tr>
                 </thead>
                 <tbody>
                 {% for ingredient in ingredient_form %}
                     <tr id="">
-                    <td>{{ ingredient.quantity }}</td>
+                    <td>{{ ingredient.amount }}</td>
                     <td>{{ ingredient.quantity_type }}</td>
-                    <td>{{ ingredient.name }}</td>
+                    <td>{{ ingredient.product }}</td>
                         <td><a href="{% url 'ingredients:ingredient-edit' form.id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
                         <td>
                             <form method="post" action="{% url 'ingredients:ingredient-delete' form.id ingredient.id %}">
@@ -39,8 +40,10 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <button class="btn btn-primary" type="submit" name="add_ingredient">Add ingredient</button>
-
+            {% endif %}
+            <div>
+               <button class="btn btn-primary" type="submit" name="add_ingredient">Add ingredient</button>
+            </div>
             <div id="div_id_preparation" class="form-group">
                 <label for="id_preparation" class=" requiredField">Preparation<span class="asteriskField">*</span></label>
                 <div>
@@ -69,6 +72,7 @@
             <div class="form-group">
                 <button class="btn btn-outline-info" type="submit">Add</button>
             </div>
+            </fieldset>
             {% endif %}
         </form>
     </div>

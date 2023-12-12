@@ -29,8 +29,8 @@ class RecipesHomePageView(LoginRequiredMixin, ListView):
 
             for ingredient in ingredients:
                 ingredient_data = {
-                    "name": ingredient.name,
-                    "quantity": ingredient.quantity,
+                    "name": ingredient.product,
+                    "quantity": ingredient.amount,
                     "quantity_type": ingredient.quantity_type,
                 }
                 recipe_data["ingredients"].append(ingredient_data)

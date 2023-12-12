@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
 from django.shortcuts import redirect, render
@@ -50,17 +51,19 @@ class MyLoginView(LoginView):
     success_url = reverse_lazy("users/home.html")
 
 
-class HomePageView(View):
+class HomePageView(LoginRequiredMixin, View):
     template_name = "users/home.html"
     context = {"title": "Home Page"}
 
     def get(self, request):
         if request.user.is_authenticated:
-            user_fridge = request.user.profile.fridges.all()
-            user_recipes = request.user.profile.recipes.all()
-            ready_recipes, sorted_keys = self.ready_recipes(user_recipes, user_fridge)
-            self.context["ready_recipes"] = ready_recipes
-            self.context["sorted_keys"] = sorted_keys
+            user_fridge = request.user.profile.useringredient_set.filter(
+                id=request.user.pk
+            )
+            user_recipes = request.user.profile.recipe_set.all()
+            # ready_recipes, sorted_keys = self.ready_recipes(user_recipes, user_fridge)
+            # self.context["ready_recipes"] = ready_recipes
+            # self.context["sorted_keys"] = sorted_keys
             self.template_name = "users/dashboard.html"
             return render(request, self.template_name, self.context)
         else:

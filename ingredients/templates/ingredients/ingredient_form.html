@@ -7,10 +7,10 @@
         <table class="table table-bordered" width="100%" cellspacing="0">
             <tbody>
                 <tr>
-                    <td id="div_id_quantity" class="form-group">
-                        <label for="id_quantity" class=" requiredField">Quantity<span class="asteriskField">*</span></label>
+                    <td id="div_id_amount" class="form-group">
+                        <label for="id_amount" class=" requiredField">Amount<span class="asteriskField">*</span></label>
                         <div>
-                            <input type="text" name="quantity" maxlength="5" class="textinput form-control" required="" id="id_quantity" value="{{ form.quantity }}">
+                            <input type="text" name="amount" maxlength="5" class="textinput form-control" required="" id="id_amount" value="{{ form.amount }}">
                         </div>
                     </td>
                     <td id="div_id_quantity_type" class="form-group">
@@ -26,30 +26,36 @@
                         </select>
                         </div>
                     </td>
-                    <td id="div_id_name" class="form-group">
-                        <label for="id_name" class=" requiredField">Name<span class="asteriskField">*</span></label>
+                    <td id="div_id_product" class="form-group">
+                        <label for="id_product" class=" requiredField">Product<span class="asteriskField">*</span></label>
                         <div>
-                            <input type="text" name="name" maxlength="50" class="textinput form-control" required="" id="id_name" value="{{ form.name }}">
+                            <select name="product_name" class="select form-control" required="" id="id_product">
+                                {% for product in products %}
+                                    <option value="{{ product.id }}" {% if product.name == form.product.name %} selected {% endif %}>{{ product.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <div>
+        <div style="display: flex; justify-content: space-between;">
             <button class="btn btn-outline-info" type="submit">Save changes</button>
+            <button class="btn btn-outline-info" type="submit" name="add_product">Add Product</button>
         </div>
         {% else %}
         <table class="table table-bordered" width="100%" cellspacing="0">
             <tbody>
                 <tr>
-                    <td>{{ form.quantity|as_crispy_field }}</td>
+                    <td>{{ form.amount|as_crispy_field }}</td>
                     <td>{{ form.quantity_type|as_crispy_field }}</td>
-                    <td>{{ form.name|as_crispy_field }}</td>
+                    <td>{{ form.product_name|as_crispy_field }}</td>
                 </tr>
             </tbody>
         </table>
-    <div>
+    <div style="display: flex; justify-content: space-between;">
         <button class="btn btn-outline-info" type="submit">Add</button>
+        <button class="btn btn-outline-info" type="submit" name="add_product">Add Product</button>
     </div>
     {% endif %}
     </form>
