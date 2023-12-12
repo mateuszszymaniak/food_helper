@@ -1,0 +1,35 @@
+{% extends 'users/dashboard_base.html' %}
+{% block content %}
+    <a href="{% url 'products:product-add' %}" class="btn btn-primary" role="button">Add</a>
+{% if products %}
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                <thead>
+                    <tr>
+                        <td>Product name</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td><a href="{% url 'products:product-edit' product.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                <td>
+                    <form method="post" action="{% url 'products:product-delete' product.id %}">
+                        {% csrf_token %}
+                     <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć przepis?')" value="Delete">
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+        {% endfor %}
+
+            </table>
+        </div>
+    </div>
+{% else %}
+    <p>Add Product</p>
+{% endif %}
+
+{% endblock %}

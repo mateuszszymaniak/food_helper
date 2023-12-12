@@ -4,10 +4,18 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, UpdateView
 
+from products.models import Product
 from recipes.models import Recipe
 
 from .forms import IngredientsForm
 from .models import Ingredient
+
+
+def delete_my_session(request):
+    del request.session["product_id"]
+    del request.session["recipe_id"]
+    if request.session["ingredient_id"]:
+        del request.session["ingredient_id"]
 
 
 class IngredientAddView(LoginRequiredMixin, CreateView):
@@ -18,15 +26,27 @@ class IngredientAddView(LoginRequiredMixin, CreateView):
 
     def get(self, request, *args, **kwargs):
         context = self.extra_context
-        context["form"] = self.form_class
+        if request.session.get("product_id"):
+            product_id = request.session.get("product_id")
+            context["form"] = self.form_class(initial={"product_name": product_id})
+            delete_my_session(request)
+        else:
+            context["form"] = self.form_class
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
         if form.is_valid():
+            if "add_product" in request.POST:
+                request.session["recipe_id"] = recipe_id
+                return redirect("products:product-add")
             recipe = Recipe.objects.get(id=recipe_id)
-            ingredient = form.save()
+            ingredient, created = Ingredient.objects.get_or_create(
+                product=form.cleaned_data.get("product_name"),
+                amount=form.cleaned_data.get("amount"),
+                quantity_type=form.cleaned_data.get("quantity_type"),
+            )
             recipe.ingredients.add(ingredient.id)
             messages.success(self.request, "Successfully added ingredient")
             return redirect("recipe-edit", recipe_id)
@@ -45,7 +65,12 @@ class IngredientEditView(LoginRequiredMixin, UpdateView):
         ingredient_id = kwargs.get("ingredient_id")
         ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
         context = self.extra_context
+        if request.session.get("product_id"):
+            product_id = request.session.get("product_id")
+            ingredient.product = Product.objects.get(id=product_id)
+            delete_my_session(request)
         context["form"] = ingredient
+        context["products"] = Product.objects.all()
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -53,13 +78,18 @@ class IngredientEditView(LoginRequiredMixin, UpdateView):
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
         if form.is_valid():
-            self.model.objects.filter(id=ingredient_id).update(
-                name=form.cleaned_data.get("name"),
-                quantity=form.cleaned_data.get("quantity"),
-                quantity_type=form.cleaned_data.get("quantity_type"),
-            )
-            messages.success(self.request, "Successfully edited ingredient")
-            return redirect("recipe-edit", recipe_id)
+            if "add_product" in request.POST:
+                request.session["recipe_id"] = recipe_id
+                request.session["ingredient_id"] = ingredient_id
+                return redirect("products:product-add")
+            else:
+                self.model.objects.filter(id=ingredient_id).update(
+                    product=form.cleaned_data.get("product_name").id,
+                    amount=form.cleaned_data.get("amount"),
+                    quantity_type=form.cleaned_data.get("quantity_type"),
+                )
+                messages.success(self.request, "Successfully edited ingredient")
+                return redirect("recipe-edit", recipe_id)
         else:
             messages.warning(request, "Invalid data in ingredient")
             return redirect("ingredients:ingredient-edit", recipe_id, ingredient_id)

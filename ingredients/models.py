@@ -1,5 +1,7 @@
 from django.db import models
 
+from products.models import Product
+
 
 class Ingredient(models.Model):
     AMOUNT_TYPE_CHOICES = (
@@ -10,11 +12,14 @@ class Ingredient(models.Model):
         ("szt.", "szt."),
         ("opak.", "opak."),
     )
-
-    name = models.CharField(max_length=50)
-    quantity = models.CharField(max_length=5)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()
     quantity_type = models.CharField(
         max_length=5,
         choices=AMOUNT_TYPE_CHOICES,
     )
+
+    def __str__(self):
+        return f"{self.product.name}, {self.quantity_type}, {self.amount}"
+
     # TODO add user in future
