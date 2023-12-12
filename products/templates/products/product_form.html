@@ -1,0 +1,29 @@
+{% extends 'users/dashboard_base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <form method="POST">
+    {% csrf_token %}
+        {% if form.id %}
+        <div id="div_name" class="form-group">
+            <label for="name" class=" requiredField">Product name<span class="asteriskField">*</span></label>
+            <div>
+                <input type="text" name="name" maxlength="100" class="textinput form-control" required="" id="name" value="{{ form.name }}">
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-outline-info" type="submit">Save changes</button>
+        </div>
+        {% else %}
+        <table class="table table-bordered" width="100%" cellspacing="0">
+            <tbody>
+                <tr>
+                    <td>{{ form.name|as_crispy_field }}</td>
+                </tr>
+            </tbody>
+        </table>
+    <div>
+        <button class="btn btn-outline-info" type="submit">Add</button>
+    </div>
+    {% endif %}
+    </form>
+{% endblock %}
