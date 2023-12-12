@@ -1,0 +1,36 @@
+{% extends 'users/dashboard_base.html' %}
+{% block content %}
+    <a href="{% url 'my_ingredients:useringredient-add' %}" class="btn btn-primary" role="button">Add</a>
+{% if useringredients %}
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellpadding="0">
+                <thead>
+                    <tr>
+                        <td>Amount</td>
+                        <td>Amount type</td>
+                        <td>Product name</td>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for useringredient in useringredients %}
+                    <tr>
+                        <td>{{ useringredient.amount }}</td>
+                        <td>{{ useringredient.ingredients.quantity_type }}</td>
+                        <td>{{ useringredient.ingredients.product.name }}</td>
+                        <td><a href="{% url 'my_ingredients:useringredient-edit' useringredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                        <td>
+                            <form method="post" action="{% url 'my_ingredients:useringredient-delete' useringredient.id %}">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć przepis?')" value="Delete">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% else %}
+    <p>Add Ingredient</p>
+{% endif %}
+{% endblock %}
