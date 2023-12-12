@@ -25,3 +25,8 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.7
+    hooks:
+      - id: ruff
+      - id: ruff-format
