@@ -85,11 +85,8 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
             if "add_product" in request.POST:
                 return redirect("products:product-add", my_ingredient_id)
             else:
-                ingredient = form.save(commit=False)
-                ingredient.product = ingredient.product = form.cleaned_data.get(
-                    "product_name"
-                )
-                ingredient.save()
+                form.instance.product = form.cleaned_data.get("product_name")
+                ingredient = form.save()
                 self.model.objects.filter(id=my_ingredient_id).update(
                     ingredients=ingredient, amount=ingredient.amount
                 )

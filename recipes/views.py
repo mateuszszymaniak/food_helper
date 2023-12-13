@@ -54,9 +54,8 @@ class RecipeAddPageView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            recipe = form.save(commit=False)
-            recipe.user = request.user.profile
-            recipe.save()
+            form.instance.user = request.user.profile
+            recipe = form.save()
             if "add_ingredient" in request.POST:
                 return redirect("ingredients:ingredient-add", recipe.id)
             else:
