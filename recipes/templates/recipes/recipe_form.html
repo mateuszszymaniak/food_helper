@@ -11,8 +11,7 @@
                     <input type="text" name="recipe_name" maxlength="100" class="textinput form-control" required="" id="id_recipe_name" value="{{ form.recipe_name }}">
                 </div>
             </div>
-
-            Ingredient
+            Ingredients
             {% if form.ingredients.count > 0 %}
             <table id="ingredient-table" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
@@ -23,15 +22,23 @@
                         <td></td>
                     </tr>
                 </thead>
+
                 <tbody>
-                {% for ingredient in ingredient_form %}
-                    <tr id="">
+                <tr style="display: none">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><form></form></td>
+                </tr>
+                {% for ingredient in form.ingredients.all %}
+                    <tr>
                     <td>{{ ingredient.amount }}</td>
                     <td>{{ ingredient.quantity_type }}</td>
                     <td>{{ ingredient.product }}</td>
                         <td><a href="{% url 'ingredients:ingredient-edit' form.id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
                         <td>
-                            <form method="post" action="{% url 'ingredients:ingredient-delete' form.id ingredient.id %}">
+                            <form method="post" action="{% url 'ingredients:ingredient-delete' form.id ingredient.pk %}">
                                 {% csrf_token %}
                                 <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" value="Delete">
                             </form>
@@ -42,7 +49,7 @@
             </table>
             {% endif %}
             <div>
-               <button class="btn btn-primary" type="submit" name="add_ingredient">Add ingredient</button>
+                <a href="{% url 'ingredients:ingredient-add' form.id%}" class="btn btn-primary" role="button">Add ingredient</a>
             </div>
             <div id="div_id_preparation" class="form-group">
                 <label for="id_preparation" class=" requiredField">Preparation<span class="asteriskField">*</span></label>
@@ -63,7 +70,7 @@
             {% else %}
             <fieldset class="form-group">
                 {{ form.recipe_name|as_crispy_field }}
-                Ingredient
+                Ingredients
                 <div>
                     <button class="btn btn-primary" type="submit" name="add_ingredient">Add ingredient</button>
                 </div>

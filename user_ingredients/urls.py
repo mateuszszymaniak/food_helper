@@ -21,7 +21,17 @@ urlpatterns = [
         name="useringredient-add",
     ),
     path(
+        "my-ingredients/add/<int:product_id>",
+        UserIngredientsAddPageView.as_view(),
+        name="useringredient-add",
+    ),
+    path(
         "my-ingredients/<int:my_ingredient_id>/edit/",
+        UserIngredientsEditPageView.as_view(),
+        name="useringredient-edit",
+    ),
+    path(
+        "my-ingredients/<int:my_ingredient_id>/edit/<int:product_id>",
         UserIngredientsEditPageView.as_view(),
         name="useringredient-edit",
     ),

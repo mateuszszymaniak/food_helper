@@ -76,10 +76,8 @@ class RecipeEditPageView(LoginRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         recipe_id = kwargs.get("recipe_id")
         recipe = get_object_or_404(self.model, pk=recipe_id)
-        ingredients = recipe.ingredients.all()
         context = self.extra_context
         context["form"] = recipe
-        context["ingredient_form"] = ingredients
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -91,11 +89,8 @@ class RecipeEditPageView(LoginRequiredMixin, UpdateView):
                 preparation=form.cleaned_data.get("preparation"),
                 tags=form.cleaned_data.get("tags"),
             )
-            if "add_ingredient" in request.POST:
-                return redirect("ingredients:ingredient-add", recipe_id)
-            else:
-                messages.success(request, "Recipe has been updated")
-                return redirect("recipes-home-page")
+            messages.success(request, "Recipe has been updated")
+            return redirect("recipes-home-page")
         else:
             messages.warning(request, "Invalid data in recipe")
             return redirect("recipe-edit", recipe_id)

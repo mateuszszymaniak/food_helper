@@ -34,23 +34,24 @@ class ProductAddPageView(LoginRequiredMixin, CreateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             product = form.save()
+            product_id = product.id
             messages.success(request, "Product has beed added")
-            if request.session.get("ingredient_id"):
-                recipe_id = request.session.get("recipe_id")
-                ingredient_id = request.session.get("ingredient_id")
-                request.session["product_id"] = product.id
-                return redirect("ingredients:ingredient-edit", recipe_id, ingredient_id)
-            if request.session.get("recipe_id"):
-                recipe_id = request.session.get("recipe_id")
-                request.session["product_id"] = product.id
-                return redirect("ingredients:ingredient-add", recipe_id)
-            if request.session.get("my_ingredient"):
-                request.session["product_id"] = product.id
-                return redirect("my_ingredients:useringredient-add")
-            if request.session.get("my_ingredient_id"):
-                my_ingredient_id = request.session.get("my_ingredient_id")
-                request.session["product_id"] = product.id
-                return redirect("my_ingredients:useringredient-edit", my_ingredient_id)
+            if kwargs.get("ingredient_id"):
+                recipe_id = kwargs.get("recipe_id")
+                ingredient_id = kwargs.get("ingredient_id")
+                return redirect(
+                    "ingredients:ingredient-edit", recipe_id, ingredient_id, product_id
+                )
+            if kwargs.get("recipe_id"):
+                recipe_id = kwargs.get("recipe_id")
+                return redirect("ingredients:ingredient-add", recipe_id, product_id)
+            if kwargs.get("new"):
+                return redirect("my_ingredients:useringredient-add", product_id)
+            if kwargs.get("my_ingredient_id"):
+                my_ingredient_id = kwargs.get("my_ingredient_id")
+                return redirect(
+                    "my_ingredients:useringredient-edit", my_ingredient_id, product_id
+                )
             return redirect("products:products-home-page")
         else:
             messages.warning(request, "Invalid data in product")
