@@ -11,7 +11,17 @@ urlpatterns = [
         name="ingredient-add",
     ),
     path(
+        "recipe/<int:recipe_id>/add_ingredient/<int:product_id>",
+        IngredientAddView.as_view(),
+        name="ingredient-add",
+    ),
+    path(
         "recipe/<int:recipe_id>/edit_ingredient/<int:ingredient_id>",
+        IngredientEditView.as_view(),
+        name="ingredient-edit",
+    ),
+    path(
+        "recipe/<int:recipe_id>/edit_ingredient/<int:ingredient_id>/<int:product_id>",
         IngredientEditView.as_view(),
         name="ingredient-edit",
     ),

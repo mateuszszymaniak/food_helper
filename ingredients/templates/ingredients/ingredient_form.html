@@ -17,12 +17,12 @@
                         <label for="id_quantity_type" class=" requiredField">Quantity type<span class="asteriskField">*</span></label>
                         <div>
                             <select name="quantity_type" class="select form-control" required="" id="id_quantity_type">
-                            <option value="kg" {% if ingredient.quantity_type == 'kg' %} selected {% endif %}>kg</option>
-                            <option value="g" {% if ingredient.quantity_type == 'g' %} selected {% endif %}>g</option>
-                            <option value="l" {% if ingredient.quantity_type == 'l' %} selected {% endif %}>l</option>
-                            <option value="ml" {% if ingredient.quantity_type == 'ml' %} selected {% endif %}>ml</option>
-                            <option value="szt." {% if ingredient.quantity_type == 'szt.' %} selected {% endif %}>szt.</option>
-                            <option value="opak." {% if ingredient.quantity_type == 'opak.' %} selected {% endif %}>opak.</option>
+                            <option value="kg" {% if form.quantity_type == 'kg' %} selected {% endif %}>kg</option>
+                            <option value="g" {% if form.quantity_type == 'g' %} selected {% endif %}>g</option>
+                            <option value="l" {% if form.quantity_type == 'l' %} selected {% endif %}>l</option>
+                            <option value="ml" {% if form.quantity_type == 'ml' %} selected {% endif %}>ml</option>
+                            <option value="szt." {% if form.quantity_type == 'szt.' %} selected {% endif %}>szt.</option>
+                            <option value="opak." {% if form.quantity_type == 'opak.' %} selected {% endif %}>opak.</option>
                         </select>
                         </div>
                     </td>
