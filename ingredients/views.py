@@ -11,13 +11,6 @@ from .forms import IngredientsForm
 from .models import Ingredient
 
 
-def delete_my_session(request):
-    del request.session["product_id"]
-    del request.session["recipe_id"]
-    if request.session["ingredient_id"]:
-        del request.session["ingredient_id"]
-
-
 class IngredientAddView(LoginRequiredMixin, CreateView):
     model = Ingredient
     form_class = IngredientsForm
@@ -26,10 +19,9 @@ class IngredientAddView(LoginRequiredMixin, CreateView):
 
     def get(self, request, *args, **kwargs):
         context = self.extra_context
-        if request.session.get("product_id"):
-            product_id = request.session.get("product_id")
+        if kwargs.get("product_id"):
+            product_id = kwargs.get("product_id")
             context["form"] = self.form_class(initial={"product_name": product_id})
-            delete_my_session(request)
         else:
             context["form"] = self.form_class
         return render(request, self.template_name, context)
@@ -39,8 +31,7 @@ class IngredientAddView(LoginRequiredMixin, CreateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             if "add_product" in request.POST:
-                request.session["recipe_id"] = recipe_id
-                return redirect("products:product-add")
+                return redirect("products:product-add", recipe_id)
             recipe = Recipe.objects.get(id=recipe_id)
             ingredient, created = Ingredient.objects.get_or_create(
                 product=form.cleaned_data.get("product_name"),
@@ -65,10 +56,9 @@ class IngredientEditView(LoginRequiredMixin, UpdateView):
         ingredient_id = kwargs.get("ingredient_id")
         ingredient = get_object_or_404(Ingredient, pk=ingredient_id)
         context = self.extra_context
-        if request.session.get("product_id"):
-            product_id = request.session.get("product_id")
+        if kwargs.get("product_id"):
+            product_id = kwargs.get("product_id")
             ingredient.product = Product.objects.get(id=product_id)
-            delete_my_session(request)
         context["form"] = ingredient
         context["products"] = Product.objects.all()
         return render(request, self.template_name, context)
@@ -79,9 +69,7 @@ class IngredientEditView(LoginRequiredMixin, UpdateView):
         form = self.form_class(request.POST)
         if form.is_valid():
             if "add_product" in request.POST:
-                request.session["recipe_id"] = recipe_id
-                request.session["ingredient_id"] = ingredient_id
-                return redirect("products:product-add")
+                return redirect("products:product-add", recipe_id, ingredient_id)
             else:
                 self.model.objects.filter(id=ingredient_id).update(
                     product=form.cleaned_data.get("product_name").id,
