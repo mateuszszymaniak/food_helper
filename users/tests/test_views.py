@@ -1,18 +1,17 @@
 from http import HTTPStatus
 
-from django.test import TestCase, tag
+from django.test import TestCase
 from django.urls import reverse
 
-from fridges.models import Fridge
 from ingredients.models import Ingredient
 from recipes.models import Recipe
+from user_ingredients.models import UserIngredient
 from users.models import Profile, User
 from users.views import HomePageView
 
 HOME_PAGE = "home-page"
 
 
-@tag("x")
 class TestViews(TestCase):
     def setUp(self):
         self.home_page = reverse("home-page")
@@ -57,7 +56,7 @@ class TestViews(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "users/login.html")
 
-    def test_home_page_view_GET_recipe_without_fridge(self):
+    def test_home_page_view_GET_recipe_without_user_ingredients(self):
         ingredient1 = Ingredient.objects.create(
             name="qwe",
             quantity="1",
@@ -94,30 +93,6 @@ class TestViews(TestCase):
         self.assertFalse("Recipes, which can be done" in response)
         self.assertFalse("Missing ingredients in recipes: " in response)
 
-    def test_home_page_view_GET_recipe_with_ingredient_in_fridge(self):
-        ingredient1 = Ingredient.objects.create(
-            name="qwe",
-            quantity="1",
-            quantity_type="kg",
-        )
-        recipe = Recipe.objects.create(
-            recipe_name="new_recipe",
-            preparation="new_prep",
-            user=self.profile1,
-        )
-        Fridge.objects.create(
-            name="qwe",
-            quantity="1",
-            quantity_type="kg",
-            user=self.profile1,
-        )
-        recipe.ingredients.add(ingredient1)
-        self.client.force_login(self.user1)
-        response = self.client.get(self.home_page)
-
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Recipes, which can be done")
-
     def test_home_page_view_GET_with_two_recipes(self):
         recipe1 = Recipe.objects.create(
             recipe_name="new_recipe",
@@ -144,36 +119,9 @@ class TestViews(TestCase):
 
         home_page_view_instance = HomePageView()
         result = home_page_view_instance.ready_recipes(
-            Recipe.objects.all(), Fridge.objects.all()
+            Recipe.objects.all(), UserIngredient.objects.all()
         )
         self.assertEquals(result, ({"1": [recipe1, recipe2]}, ["1"]))
-
-    def test_home_page_view_GET_recipe_with_ingredient_in_fridge_with_different_quantity_type(
-        self,
-    ):
-        ingredient1 = Ingredient.objects.create(
-            name="qwe",
-            quantity="1",
-            quantity_type="g",
-        )
-        recipe = Recipe.objects.create(
-            recipe_name="new_recipe",
-            preparation="new_prep",
-            user=self.profile1,
-        )
-        Fridge.objects.create(
-            name="qwe",
-            quantity="1",
-            quantity_type="kg",
-            user=self.profile1,
-        )
-        recipe.ingredients.add(ingredient1)
-        self.client.force_login(self.user1)
-        response = self.client.get(self.home_page)
-
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertFalse("Recipes, which can be done" in response)
-        self.assertContains(response, "Missing ingredients in recipes:")
 
     def test_login_page_view_POST_incorrect_credentials(self):
         """
