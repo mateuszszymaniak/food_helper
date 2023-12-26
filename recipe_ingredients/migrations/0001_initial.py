@@ -8,12 +8,12 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("products", "0001_initial"),
+        ("ingredients", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name="Ingredient",
+            name="RecipeIngredients",
             fields=[
                 (
                     "id",
@@ -24,25 +24,12 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
+                ("amount", models.PositiveIntegerField()),
                 (
-                    "quantity_type",
-                    models.CharField(
-                        choices=[
-                            ("kg", "kg"),
-                            ("g", "g"),
-                            ("l", "l"),
-                            ("ml", "ml"),
-                            ("szt.", "szt."),
-                            ("opak.", "opak."),
-                        ],
-                        max_length=5,
-                    ),
-                ),
-                (
-                    "product",
+                    "ingredient",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to="products.product",
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="ingredients.ingredient",
                     ),
                 ),
             ],
