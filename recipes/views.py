@@ -25,13 +25,13 @@ class RecipesHomePageView(LoginRequiredMixin, ListView):
                 "ingredients": [],
             }
 
-            ingredients = recipe.ingredients.all()
+            ingredients = recipe.recipe_ingredient.all()
 
             for ingredient in ingredients:
                 ingredient_data = {
-                    "name": ingredient.product,
+                    "name": ingredient.ingredient.product.name,
                     "quantity": ingredient.amount,
-                    "quantity_type": ingredient.quantity_type,
+                    "quantity_type": ingredient.ingredient.quantity_type,
                 }
                 recipe_data["ingredients"].append(ingredient_data)
             recipes_with_ingredients.append(recipe_data)
@@ -57,7 +57,7 @@ class RecipeAddPageView(LoginRequiredMixin, CreateView):
             form.instance.user = request.user.profile
             recipe = form.save()
             if "add_ingredient" in request.POST:
-                return redirect("ingredients:ingredient-add", recipe.id)
+                return redirect("recipe_ingredients:ingredient-add", recipe.id)
             else:
                 messages.success(request, "Recipe has been added")
                 return redirect("recipes-home-page")
@@ -77,6 +77,7 @@ class RecipeEditPageView(LoginRequiredMixin, UpdateView):
         recipe = get_object_or_404(self.model, pk=recipe_id)
         context = self.extra_context
         context["form"] = recipe
+        context["ingredients"] = recipe.recipe_ingredient.all().order_by("id")
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):

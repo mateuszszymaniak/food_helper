@@ -11,6 +11,14 @@ from products.models import Product
 from .models import UserIngredient
 
 
+def find_ingredient(form: dict) -> [Ingredient, bool]:
+    ingredient, created = Ingredient.objects.get_or_create(
+        product=form.get("product_name"),
+        quantity_type=form.get("quantity_type"),
+    )
+    return ingredient, created
+
+
 class UserIngredientsHomePageView(LoginRequiredMixin, ListView):
     model = UserIngredient
     template_name = "useringredients/home.html"
@@ -44,15 +52,11 @@ class UserIngredientsAddPageView(LoginRequiredMixin, CreateView):
         if form.is_valid():
             if "add_product" in request.POST:
                 return redirect("products:product-add", "new")
-            ingredient, created = Ingredient.objects.get_or_create(
-                product=form.cleaned_data.get("product_name"),
-                amount=form.cleaned_data.get("amount"),
-                quantity_type=form.cleaned_data.get("quantity_type"),
-            )
+            ingredient, created = find_ingredient(form.cleaned_data)
             self.model.objects.get_or_create(
                 user=request.user.profile,
                 ingredients=ingredient,
-                amount=ingredient.amount,
+                amount=form.cleaned_data.get("amount"),
             )
             messages.success(request, "My Ingredient has been successfully added")
             return redirect("my_ingredients:useringredients-home-page")
@@ -74,8 +78,13 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
         if kwargs.get("product_id"):
             product_id = kwargs.get("product_id")
             my_ingredient.ingredients.product = Product.objects.get(id=product_id)
-        context["form"] = my_ingredient
-        context["products"] = Product.objects.all()
+        context["form"] = self.form_class(
+            initial={
+                "product_name": my_ingredient.ingredients.product,
+                "quantity_type": my_ingredient.ingredients.quantity_type,
+                "amount": my_ingredient.amount,
+            }
+        )
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -85,10 +94,9 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
             if "add_product" in request.POST:
                 return redirect("products:product-add", my_ingredient_id)
             else:
-                form.instance.product = form.cleaned_data.get("product_name")
-                ingredient = form.save()
+                ingredient, created = find_ingredient(form.cleaned_data)
                 self.model.objects.filter(id=my_ingredient_id).update(
-                    ingredients=ingredient, amount=ingredient.amount
+                    ingredients=ingredient, amount=form.cleaned_data.get("amount")
                 )
                 messages.success(request, "Successfully edited my ingredient")
                 return redirect("my_ingredients:useringredients-home-page")

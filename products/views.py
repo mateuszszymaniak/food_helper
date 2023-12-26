@@ -44,7 +44,9 @@ class ProductAddPageView(LoginRequiredMixin, CreateView):
                 )
             if kwargs.get("recipe_id"):
                 recipe_id = kwargs.get("recipe_id")
-                return redirect("ingredients:ingredient-add", recipe_id, product_id)
+                return redirect(
+                    "recipe_ingredients:ingredient-add", recipe_id, product_id
+                )
             if kwargs.get("new"):
                 return redirect("my_ingredients:useringredient-add", product_id)
             if kwargs.get("my_ingredient_id"):

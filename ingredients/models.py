@@ -13,13 +13,12 @@ class Ingredient(models.Model):
         ("opak.", "opak."),
     )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField()
     quantity_type = models.CharField(
         max_length=5,
         choices=AMOUNT_TYPE_CHOICES,
     )
 
     def __str__(self):
-        return f"{self.product.name}, {self.quantity_type}, {self.amount}"
+        return f"{self.product.name}, {self.quantity_type}"
 
     # TODO add user in future
