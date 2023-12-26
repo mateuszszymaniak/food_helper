@@ -53,12 +53,23 @@ class UserIngredientsAddPageView(LoginRequiredMixin, CreateView):
             if "add_product" in request.POST:
                 return redirect("products:product-add", "new")
             ingredient, created = find_ingredient(form.cleaned_data)
-            self.model.objects.get_or_create(
-                user=request.user.profile,
-                ingredients=ingredient,
-                amount=form.cleaned_data.get("amount"),
+            did_user_have_ingredient = UserIngredient.objects.get(
+                ingredients=ingredient
             )
-            messages.success(request, "My Ingredient has been successfully added")
+            if did_user_have_ingredient:
+                did_user_have_ingredient.amount += form.cleaned_data.get("amount")
+                did_user_have_ingredient.save()
+                messages.success(
+                    request,
+                    f"{did_user_have_ingredient.ingredients.product.name} has been added previously. Amount was updated",
+                )
+            else:
+                self.model.objects.get_or_create(
+                    user=request.user.profile,
+                    ingredients=ingredient,
+                    amount=form.cleaned_data.get("amount"),
+                )
+                messages.success(request, "My Ingredient has been successfully added")
             return redirect("my_ingredients:useringredients-home-page")
         else:
             messages.warning(request, "Invalid data in my ingredients")
