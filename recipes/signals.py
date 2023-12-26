@@ -6,7 +6,7 @@ from recipes.models import Recipe
 
 @receiver(pre_delete, sender=Recipe)
 def pre_delete_recipe(sender, instance, **kwargs):
-    ingredients = instance.ingredients.all()
+    ingredients = instance.recipe_ingredient.all()
 
     for ingredient in ingredients:
         ingredient.delete()

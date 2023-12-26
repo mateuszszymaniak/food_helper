@@ -12,7 +12,7 @@
                 </div>
             </div>
             Ingredients
-            {% if form.ingredients.count > 0 %}
+            {% if form.recipe_ingredient.count > 0 %}
             <table id="ingredient-table" class="table table-bordered" width="100%" cellspacing="0">
                 <thead>
                     <tr>
@@ -31,14 +31,14 @@
                     <td></td>
                     <td><form></form></td>
                 </tr>
-                {% for ingredient in form.ingredients.all %}
+                {% for ingredient in ingredients %}
                     <tr>
                     <td>{{ ingredient.amount }}</td>
-                    <td>{{ ingredient.quantity_type }}</td>
-                    <td>{{ ingredient.product }}</td>
-                        <td><a href="{% url 'ingredients:ingredient-edit' form.id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                    <td>{{ ingredient.ingredient.quantity_type }}</td>
+                    <td>{{ ingredient.ingredient.product.name }}</td>
+                        <td><a href="{% url 'recipe_ingredients:ingredient-edit' form.id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
                         <td>
-                            <form method="post" action="{% url 'ingredients:ingredient-delete' form.id ingredient.pk %}">
+                            <form method="post" action="{% url 'recipe_ingredients:ingredient-delete' form.id ingredient.id %}">
                                 {% csrf_token %}
                                 <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" value="Delete">
                             </form>
@@ -49,7 +49,7 @@
             </table>
             {% endif %}
             <div>
-                <a href="{% url 'ingredients:ingredient-add' form.id%}" class="btn btn-primary" role="button">Add ingredient</a>
+                <a href="{% url 'recipe_ingredients:ingredient-add' form.id%}" class="btn btn-primary" role="button">Add ingredient</a>
             </div>
             <div id="div_id_preparation" class="form-group">
                 <label for="id_preparation" class=" requiredField">Preparation<span class="asteriskField">*</span></label>
