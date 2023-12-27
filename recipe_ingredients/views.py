@@ -66,7 +66,7 @@ class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
             initial={
                 "product_name": recipe_ingredient.ingredient.product,
                 "quantity_type": recipe_ingredient.ingredient.quantity_type,
-                "amount": self.model.objects.get(id=ingredient_id),
+                "amount": self.model.objects.get(id=ingredient_id).amount,
             }
         )
         return render(request, self.template_name, context)
