@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from django.test import TestCase, tag
+from django.test import TestCase
 from django.urls import reverse
 
 from recipes.factories import RecipeFactory
@@ -29,7 +29,7 @@ class IngredientsViews(TestCase):
             preparation=self.recipe_factory.preparation,
             user=self.profile1,
         )
-        self.recipe.ingredients.add(self.ingredient)
+        self.recipe.ingredient.add(self.ingredient)
         self.ingredient_add_page = reverse(
             "ingredients:ingredient-add", args=[self.recipe.id]
         )

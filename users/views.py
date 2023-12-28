@@ -84,10 +84,10 @@ class HomePageView(LoginRequiredMixin, View):
                 ingredient_found = False
                 for user_ingredient_item in user_ingredients:
                     if (
-                        ingredient_name == user_ingredient_item.ingredients.product.name
+                        ingredient_name == user_ingredient_item.ingredient.product.name
                         and ingredient_quantity <= user_ingredient_item.amount
                         and ingredient_quantity_type
-                        == user_ingredient_item.ingredients.quantity_type
+                        == user_ingredient_item.ingredient.quantity_type
                     ):
                         ingredient_found = True
                         break

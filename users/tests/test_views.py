@@ -72,8 +72,8 @@ class TestViews(TestCase):
             preparation="new_prep",
             user=self.profile1,
         )
-        recipe.ingredients.add(ingredient1)
-        recipe.ingredients.add(ingredient2)
+        recipe.ingredient.add(ingredient1)
+        recipe.ingredient.add(ingredient2)
         self.client.force_login(self.user1)
         response = self.client.get(self.home_page)
 
@@ -114,8 +114,8 @@ class TestViews(TestCase):
             quantity="12",
             quantity_type="g",
         )
-        recipe1.ingredients.add(ingredient1)
-        recipe2.ingredients.add(ingredient2)
+        recipe1.ingredient.add(ingredient1)
+        recipe2.ingredient.add(ingredient2)
 
         home_page_view_instance = HomePageView()
         result = home_page_view_instance.ready_recipes(

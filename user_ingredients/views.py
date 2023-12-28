@@ -62,7 +62,7 @@ class UserIngredientsAddPageView(LoginRequiredMixin, CreateView):
                 did_user_have_ingredient.save()
                 messages.success(
                     request,
-                    f"{did_user_have_ingredient.ingredients.product.name} has been added previously. Amount was updated",
+                    f"{did_user_have_ingredient.ingredient.product.name} has been added previously. Amount was updated",
                 )
             else:
                 self.model.objects.get_or_create(
@@ -89,11 +89,11 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
         context = self.extra_context
         if kwargs.get("product_id"):
             product_id = kwargs.get("product_id")
-            my_ingredient.ingredients.product = Product.objects.get(id=product_id)
+            my_ingredient.ingredient.product = Product.objects.get(id=product_id)
         context["form"] = self.form_class(
             initial={
-                "product_name": my_ingredient.ingredients.product,
-                "quantity_type": my_ingredient.ingredients.quantity_type,
+                "product_name": my_ingredient.ingredient.product,
+                "quantity_type": my_ingredient.ingredient.quantity_type,
                 "amount": my_ingredient.amount,
             }
         )
