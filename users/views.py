@@ -57,36 +57,37 @@ class HomePageView(LoginRequiredMixin, View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            user_fridge = request.user.profile.useringredient_set.filter(
-                id=request.user.pk
-            )
+            user_ingredients = request.user.profile.useringredient_set.all()
             user_recipes = request.user.profile.recipe_set.all()
-            # ready_recipes, sorted_keys = self.ready_recipes(user_recipes, user_fridge)
-            # self.context["ready_recipes"] = ready_recipes
-            # self.context["sorted_keys"] = sorted_keys
+            ready_recipes, sorted_keys = self.ready_recipes(
+                user_recipes, user_ingredients
+            )
+            self.context["ready_recipes"] = ready_recipes
+            self.context["sorted_keys"] = sorted_keys
             self.template_name = "users/dashboard.html"
             return render(request, self.template_name, self.context)
         else:
             return render(request, self.template_name, self.context)
 
-    def ready_recipes(self, user_recipes, fridge):
+    def ready_recipes(self, user_recipes, user_ingredients):
         result_recipes = {}
 
         for recipe in user_recipes:
-            ingredients = recipe.ingredients.all()
+            ingredients = recipe.recipe_ingredient.all()
             if len(ingredients) == 0:
                 continue
             missing_ingredients_counter = 0
             for ingredient_item in ingredients:
-                ingredient_name = ingredient_item.name
-                ingredient_quantity = int(ingredient_item.quantity)
-                ingredient_quantity_type = ingredient_item.quantity_type
+                ingredient_name = ingredient_item.ingredient.product.name
+                ingredient_quantity = ingredient_item.amount
+                ingredient_quantity_type = ingredient_item.ingredient.quantity_type
                 ingredient_found = False
-                for fridge_item in fridge:
+                for user_ingredient_item in user_ingredients:
                     if (
-                        ingredient_name == fridge_item.name
-                        and ingredient_quantity <= int(fridge_item.quantity)
-                        and ingredient_quantity_type == fridge_item.quantity_type
+                        ingredient_name == user_ingredient_item.ingredients.product.name
+                        and ingredient_quantity <= user_ingredient_item.amount
+                        and ingredient_quantity_type
+                        == user_ingredient_item.ingredients.quantity_type
                     ):
                         ingredient_found = True
                         break
