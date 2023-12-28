@@ -53,9 +53,10 @@ class UserIngredientsAddPageView(LoginRequiredMixin, CreateView):
             return redirect("products:product-add", "new")
         if form.is_valid():
             ingredient, created = find_ingredient(form.cleaned_data)
-            did_user_have_ingredient = UserIngredient.objects.get(
-                ingredients=ingredient
-            )
+            did_user_have_ingredient = self.model.objects.filter(
+                user=request.user.profile,
+                ingredients=ingredient,
+            ).first()
             if did_user_have_ingredient:
                 did_user_have_ingredient.amount += form.cleaned_data.get("amount")
                 did_user_have_ingredient.save()
@@ -106,7 +107,8 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
         if form.is_valid():
             ingredient, created = find_ingredient(form.cleaned_data)
             self.model.objects.filter(id=my_ingredient_id).update(
-                ingredients=ingredient, amount=form.cleaned_data.get("amount")
+                ingredients=ingredient,
+                amount=form.cleaned_data.get("amount"),
             )
             messages.success(request, "Successfully edited my ingredient")
             return redirect("my_ingredients:useringredients-home-page")
