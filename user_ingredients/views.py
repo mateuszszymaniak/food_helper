@@ -49,9 +49,9 @@ class UserIngredientsAddPageView(LoginRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        if "add_product" in request.POST:
+            return redirect("products:product-add", "new")
         if form.is_valid():
-            if "add_product" in request.POST:
-                return redirect("products:product-add", "new")
             ingredient, created = find_ingredient(form.cleaned_data)
             did_user_have_ingredient = UserIngredient.objects.get(
                 ingredients=ingredient
@@ -101,16 +101,15 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         my_ingredient_id = kwargs.get("my_ingredient_id")
         form = self.form_class(request.POST)
+        if "add_product" in request.POST:
+            return redirect("products:product-add", my_ingredient_id)
         if form.is_valid():
-            if "add_product" in request.POST:
-                return redirect("products:product-add", my_ingredient_id)
-            else:
-                ingredient, created = find_ingredient(form.cleaned_data)
-                self.model.objects.filter(id=my_ingredient_id).update(
-                    ingredients=ingredient, amount=form.cleaned_data.get("amount")
-                )
-                messages.success(request, "Successfully edited my ingredient")
-                return redirect("my_ingredients:useringredients-home-page")
+            ingredient, created = find_ingredient(form.cleaned_data)
+            self.model.objects.filter(id=my_ingredient_id).update(
+                ingredients=ingredient, amount=form.cleaned_data.get("amount")
+            )
+            messages.success(request, "Successfully edited my ingredient")
+            return redirect("my_ingredients:useringredients-home-page")
         else:
             messages.warning(request, "Invalid data in editing my ingredient")
             return redirect("my_ingredients:useringredient-edit", my_ingredient_id)

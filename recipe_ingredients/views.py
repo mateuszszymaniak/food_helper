@@ -30,9 +30,9 @@ class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
+        if "add_product" in request.POST:
+            return redirect("products:product-add", recipe_id)
         if form.is_valid():
-            if "add_product" in request.POST:
-                return redirect("products:product-add", recipe_id)
             recipe = Recipe.objects.get(id=recipe_id)
             ingredient, created = Ingredient.objects.get_or_create(
                 product=form.cleaned_data.get("product_name"),
@@ -75,19 +75,18 @@ class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
         ingredient_id = kwargs.get("ingredient_id")
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
+        if "add_product" in request.POST:
+            return redirect("products:product-add", recipe_id, ingredient_id)
         if form.is_valid():
-            if "add_product" in request.POST:
-                return redirect("products:product-add", recipe_id, ingredient_id)
-            else:
-                ingredient, created = Ingredient.objects.get_or_create(
-                    product=form.cleaned_data.get("product_name"),
-                    quantity_type=form.cleaned_data.get("quantity_type"),
-                )
-                self.model.objects.filter(id=ingredient_id).update(
-                    ingredient=ingredient, amount=form.cleaned_data.get("amount")
-                )
-                messages.success(request, "Successfully edited ingredient")
-                return redirect("recipe-edit", recipe_id)
+            ingredient, created = Ingredient.objects.get_or_create(
+                product=form.cleaned_data.get("product_name"),
+                quantity_type=form.cleaned_data.get("quantity_type"),
+            )
+            self.model.objects.filter(id=ingredient_id).update(
+                ingredient=ingredient, amount=form.cleaned_data.get("amount")
+            )
+            messages.success(request, "Successfully edited ingredient")
+            return redirect("recipe-edit", recipe_id)
         else:
             messages.warning(request, "Invalid data in ingredient")
             return redirect(
