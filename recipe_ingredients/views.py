@@ -23,10 +23,12 @@ class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
         context = self.extra_context
         if kwargs.get("product_id"):
             product_id = kwargs.get("product_id")
-            context["form"] = self.form_class(initial={"product_name": product_id})
+            context["ingredient_form"] = IngredientForm(
+                prefix="ingredient", initial={"product_name": product_id}
+            )
         else:
-            context["form"] = self.form_class
-        context["ingredient_form"] = IngredientForm(prefix="ingredient")
+            context["ingredient_form"] = IngredientForm(prefix="ingredient")
+        context["form"] = self.form_class
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -64,7 +66,7 @@ class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
         context = self.extra_context
         if kwargs.get("product_id"):
             product_id = kwargs.get("product_id")
-            recipe_ingredient.product = Product.objects.get(id=product_id)
+            recipe_ingredient.ingredient.product = Product.objects.get(id=product_id)
         context["form"] = self.form_class(
             initial={"amount": self.model.objects.get(id=ingredient_id).amount}
         )

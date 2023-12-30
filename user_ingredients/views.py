@@ -43,17 +43,19 @@ class UserIngredientsAddPageView(LoginRequiredMixin, CreateView):
         context = self.extra_context
         if kwargs.get("product_id"):
             product_id = kwargs.get("product_id")
-            context["form"] = self.form_class(initial={"product_name": product_id})
+            context["ingredient_form"] = IngredientForm(
+                prefix="ingredient", initial={"product_name": product_id}
+            )
         else:
-            context["form"] = self.form_class
-        context["ingredient_form"] = IngredientForm(prefix="ingredient")
+            context["ingredient_form"] = IngredientForm(prefix="ingredient")
+        context["form"] = self.form_class
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
         if "add_product" in request.POST:
-            return redirect("products:product-add", "new")
+            return redirect("products:product-add-new", "new")
         if form.is_valid() and ingredient_form.is_valid():
             ingredient, created = find_ingredient(ingredient_form.cleaned_data)
             did_user_have_ingredient = self.model.objects.filter(
