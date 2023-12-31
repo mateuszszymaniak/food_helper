@@ -35,12 +35,15 @@ class ProductAddPageView(LoginRequiredMixin, CreateView):
         if form.is_valid():
             product = form.save()
             product_id = product.id
-            messages.success(request, "Product has beed added")
+            messages.success(request, "Product has been added")
             if kwargs.get("ingredient_id"):
                 recipe_id = kwargs.get("recipe_id")
                 ingredient_id = kwargs.get("ingredient_id")
                 return redirect(
-                    "ingredients:ingredient-edit", recipe_id, ingredient_id, product_id
+                    "recipe_ingredients:ingredient-edit",
+                    recipe_id,
+                    ingredient_id,
+                    product_id,
                 )
             if kwargs.get("recipe_id"):
                 recipe_id = kwargs.get("recipe_id")

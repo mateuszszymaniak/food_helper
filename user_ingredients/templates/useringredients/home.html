@@ -16,8 +16,8 @@
                 {% for useringredient in useringredients %}
                     <tr>
                         <td>{{ useringredient.amount }}</td>
-                        <td>{{ useringredient.ingredients.quantity_type }}</td>
-                        <td>{{ useringredient.ingredients.product.name }}</td>
+                        <td>{{ useringredient.ingredient.quantity_type }}</td>
+                        <td>{{ useringredient.ingredient.product.name }}</td>
                         <td><a href="{% url 'my_ingredients:useringredient-edit' useringredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
                         <td>
                             <form method="post" action="{% url 'my_ingredients:useringredient-delete' useringredient.id %}">

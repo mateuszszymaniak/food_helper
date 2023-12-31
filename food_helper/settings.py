@@ -50,7 +50,6 @@ INSTALLED_APPS = [
 INSTALLED_EXTENSIONS = [
     "users",
     "recipes",
-    "fridges",
     "ingredients",
     "products",
     "user_ingredients",

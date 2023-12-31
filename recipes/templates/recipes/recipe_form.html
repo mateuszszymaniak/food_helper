@@ -4,83 +4,58 @@
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
-            {% if form.id %}
-            <div id="div_id_recipe_name" class="form-group">
-                <label for="id_recipe_name" class=" requiredField">Recipe name<span class="asteriskField">*</span></label>
-                <div>
-                    <input type="text" name="recipe_name" maxlength="100" class="textinput form-control" required="" id="id_recipe_name" value="{{ form.recipe_name }}">
-                </div>
-            </div>
-            Ingredients
-            {% if form.recipe_ingredient.count > 0 %}
-            <table id="ingredient-table" class="table table-bordered" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <td>Amount</td>
-                        <td>Quantity type</td>
-                        <td>Product</td>
-                        <td></td>
-                    </tr>
-                </thead>
-
-                <tbody>
-                <tr style="display: none">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><form></form></td>
-                </tr>
-                {% for ingredient in ingredients %}
-                    <tr>
-                    <td>{{ ingredient.amount }}</td>
-                    <td>{{ ingredient.ingredient.quantity_type }}</td>
-                    <td>{{ ingredient.ingredient.product.name }}</td>
-                        <td><a href="{% url 'recipe_ingredients:ingredient-edit' form.id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
-                        <td>
-                            <form method="post" action="{% url 'recipe_ingredients:ingredient-delete' form.id ingredient.id %}">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" value="Delete">
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
-            <div>
-                <a href="{% url 'recipe_ingredients:ingredient-add' form.id%}" class="btn btn-primary" role="button">Add ingredient</a>
-            </div>
-            <div id="div_id_preparation" class="form-group">
-                <label for="id_preparation" class=" requiredField">Preparation<span class="asteriskField">*</span></label>
-                <div>
-                    <textarea name="preparation" cols="40" rows="10" class="textarea form-control" required="" id="id_preparation">{{ form.preparation }}</textarea>
-                </div>
-            </div>
-
-            <div id="div_id_tags" class="form-group">
-                <label for="id_tags" class="">Tags</label>
-                <div>
-                    <input type="text" name="tags" class="textinput form-control" id="id_tags" value="{% for tag in form.tags %}{{ tag }}{% endfor %}">
-                </div>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Zapisz zmiany</button>
-            </div>
-            {% else %}
             <fieldset class="form-group">
                 {{ form.recipe_name|as_crispy_field }}
                 Ingredients
                 <div>
                     <button class="btn btn-primary" type="submit" name="add_ingredient">Add ingredient</button>
                 </div>
+                {% if ingredients.count > 0 %}
+                    <table id="ingredient-table" class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <td>Amount</td>
+                            <td>Quantity type</td>
+                            <td>Product</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr style="display: none">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><form></form></td>
+                    </tr>
+                    {% for ingredient in ingredients %}
+                        <tr>
+                            <td>{{ ingredient.amount }}</td>
+                            <td>{{ ingredient.ingredient.quantity_type }}</td>
+                            <td>{{ ingredient.ingredient.product.name }}</td>
+                            <td><a href="{% url 'recipe_ingredients:ingredient-edit' form.initial.recipe_id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                            <td>
+                                <form method="post" action="{% url 'recipe_ingredients:ingredient-delete' form.initial.recipe_id ingredient.id %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć składnik?')" value="Delete">
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                {% endif %}
                 {{ form.preparation|as_crispy_field }}
                 {{ form.tags|as_crispy_field }}
             <div class="form-group">
+                {% if "Add" in title %}
                 <button class="btn btn-outline-info" type="submit">Add</button>
+                {% else %}
+                <button class="btn btn-outline-info" type="submit">Save changes</button>
+                {% endif %}
             </div>
             </fieldset>
-            {% endif %}
         </form>
     </div>
 {% endblock %}
