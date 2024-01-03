@@ -54,8 +54,6 @@ class UserIngredientsAddPageView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
-        if "add_product" in request.POST:
-            return redirect("products:product-add-new", "new")
         if form.is_valid() and ingredient_form.is_valid():
             ingredient, created = find_ingredient(ingredient_form.cleaned_data)
             did_user_have_ingredient = self.model.objects.filter(
@@ -109,8 +107,6 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
         my_ingredient_id = kwargs.get("my_ingredient_id")
         form = self.form_class(request.POST)
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
-        if "add_product" in request.POST:
-            return redirect("products:product-add", my_ingredient_id)
         if form.is_valid() and ingredient_form.is_valid():
             ingredient, created = find_ingredient(ingredient_form.cleaned_data)
             self.model.objects.filter(id=my_ingredient_id).update(

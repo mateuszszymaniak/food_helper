@@ -35,8 +35,6 @@ class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
-        if "add_product" in request.POST:
-            return redirect("products:product-add", recipe_id)
         if form.is_valid() and ingredient_form.is_valid():
             recipe = Recipe.objects.get(id=recipe_id)
             ingredient, created = Ingredient.objects.get_or_create(
@@ -84,8 +82,6 @@ class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
-        if "add_product" in request.POST:
-            return redirect("products:product-add", recipe_id, ingredient_id)
         if form.is_valid() and ingredient_form.is_valid():
             ingredient, created = Ingredient.objects.get_or_create(
                 product=ingredient_form.cleaned_data.get("product_name"),

@@ -10,7 +10,7 @@ app_name = "recipe_ingredients"
 
 urlpatterns = [
     path(
-        "recipe-ingredient/<int:recipe_id>/add-ingredient",
+        "recipe-ingredient/<int:recipe_id>/add-ingredient/",
         RecipeIngredientAddView.as_view(),
         name="ingredient-add",
     ),
@@ -20,7 +20,7 @@ urlpatterns = [
         name="ingredient-add",
     ),
     path(
-        "recipe-ingredient/<int:recipe_id>/edit-ingredient/<int:ingredient_id>",
+        "recipe-ingredient/<int:recipe_id>/edit-ingredient/<int:ingredient_id>/",
         RecipeIngredientEditView.as_view(),
         name="ingredient-edit",
     ),
