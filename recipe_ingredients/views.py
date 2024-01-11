@@ -10,11 +10,11 @@ from products.models import Product
 from recipes.models import Recipe
 
 from .forms import RecipeIngredientForm
-from .models import RecipeIngredients
+from .models import RecipeIngredient
 
 
 class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
-    model = RecipeIngredients
+    model = RecipeIngredient
     form_class = RecipeIngredientForm
     template_name = "ingredients/ingredient_form.html"
     extra_context = {"title": "Add Recipe Ingredient"}
@@ -53,7 +53,7 @@ class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
 
 
 class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
-    model = RecipeIngredients
+    model = RecipeIngredient
     form_class = RecipeIngredientForm
     template_name = "ingredients/ingredient_form.html"
     extra_context = {"title": "Edit Recipe Ingredient"}
@@ -100,7 +100,7 @@ class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
 
 
 class RecipeIngredientDeleteView(LoginRequiredMixin, DeleteView):
-    model = RecipeIngredients
+    model = RecipeIngredient
 
     def get_success_url(self):
         recipe_id = self.kwargs.get("recipe_id")
