@@ -25,12 +25,12 @@ urlpatterns = [
         name="ingredient-edit",
     ),
     path(
-        "recipe-ingredient/<int:recipe_id>/edit-ingredient/<int:ingredient_id>/<int:product_id>",
+        "recipe-ingredient/<int:recipe_id>/edit-ingredient/<int:ingredient_id>/<int:product_id>/",
         RecipeIngredientEditView.as_view(),
         name="ingredient-edit",
     ),
     path(
-        "recipe-ingredient/<int:recipe_id>/delete-ingredient/<int:pk>",
+        "recipe-ingredient/<int:recipe_id>/delete-ingredient/<int:pk>/",
         RecipeIngredientDeleteView.as_view(),
         name="ingredient-delete",
     ),
