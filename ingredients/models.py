@@ -20,5 +20,3 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return f"{self.product.name}, {self.quantity_type}"
-
-    # TODO add user in future
