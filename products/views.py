@@ -28,7 +28,8 @@ class ProductAddPageView(LoginRequiredMixin, CreateView):
     def get(self, request, *args, **kwargs):
         context = self.extra_context
         context["form"] = self.form_class
-        context["referer"] = request.META["HTTP_REFERER"]
+        if "HTTP_REFERER" in request.META:
+            context["referer"] = request.META["HTTP_REFERER"]
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -37,7 +38,9 @@ class ProductAddPageView(LoginRequiredMixin, CreateView):
             product = form.save()
             product_id = product.id
             messages.success(request, "Product has been added")
-            if "/product/" in self.extra_context.get("referer"):
+            if self.extra_context.get(
+                "referer"
+            ) is None or "/product/" in self.extra_context.get("referer"):
                 return redirect("products:products-home-page")
             return redirect(self.extra_context.get("referer").__add__(f"{product_id}"))
         else:
