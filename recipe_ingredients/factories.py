@@ -4,12 +4,12 @@ from factory.django import DjangoModelFactory
 
 from ingredients.factories import IngredientFactory
 
-from .models import UserIngredient
+from .models import RecipeIngredient
 
 
-class UserIngredientFactory(DjangoModelFactory):
+class RecipeIngredientFactory(DjangoModelFactory):
     class Meta:
-        model = UserIngredient
+        model = RecipeIngredient
 
     ingredient = SubFactory(IngredientFactory)
     amount = factory.Faker("random_int", min=1, max=100)
