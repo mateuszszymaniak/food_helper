@@ -1,25 +1,42 @@
-from django.test import TestCase, tag
+from django.test import TestCase
 
-from ..factories import IngredientFactory
-from ..forms import IngredientsForm
+from products.factorires import ProductFactory
+
+from ..forms import IngredientForm
 
 
 class IngredientFormTest(TestCase):
+    def setUp(self):
+        self.product = ProductFactory.create()
+
     def test_valid_recipe_form(self):
-        ingredient = IngredientFactory.create()
         ingredient_data = {
-            "name": ingredient.name,
-            "quantity": ingredient.quantity,
-            "quantity_type": ingredient.quantity_type,
+            "product_name": self.product.id,
+            "quantity_type": "kg",
         }
-        form = IngredientsForm(data=ingredient_data)
+        form = IngredientForm(data=ingredient_data)
         self.assertTrue(form.is_valid())
 
-    def test_invalid_recipe_form(self):
-        ingredient = IngredientFactory.create()
+    def test_invalid_recipe_form_both_wrong(self):
         ingredient_data = {
-            "quantity": ingredient.quantity,
-            "quantity_type": ingredient.quantity_type,
+            "quantity": "qwe",
+            "quantity_type": "abc",
         }
-        form = IngredientsForm(data=ingredient_data)
+        form = IngredientForm(data=ingredient_data)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_recipe_form_quality_wrong(self):
+        ingredient_data = {
+            "quantity": "qwe",
+            "quantity_type": "l",
+        }
+        form = IngredientForm(data=ingredient_data)
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_recipe_form_wrong_quantity_type(self):
+        ingredient_data = {
+            "quantity": "1",
+            "quantity_type": "xer",
+        }
+        form = IngredientForm(data=ingredient_data)
         self.assertFalse(form.is_valid())

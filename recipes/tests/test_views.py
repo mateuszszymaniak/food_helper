@@ -3,59 +3,64 @@ from http import HTTPStatus
 from django.test import TestCase
 from django.urls import reverse
 
-from ingredients.factories import IngredientFactory
+from ingredients.models import Ingredient
+from recipe_ingredients.factories import RecipeIngredientFactory
 from users.factories import UserFactory
 from users.models import Profile
 
 from ..factories import RecipeFactory
-from ..models import Ingredient, Recipe
+from ..models import Recipe
 
 
 class RecipesViews(TestCase):
     def setUp(self):
+        self.user = UserFactory.create()
+        self.profile, _ = Profile.objects.get_or_create(user=self.user)
+        self.client.force_login(self.user)
+        self.recipe_ingredient_factory = RecipeIngredientFactory.create()
+        self.recipe = RecipeFactory.create(user=self.profile)
+        Recipe.objects.get(id=self.recipe.id).recipe_ingredient.add(
+            self.recipe_ingredient_factory
+        )
         self.recipes_home_page = reverse("recipes-home-page")
         self.recipe_add_page = reverse("recipe-add")
-        self.user1 = UserFactory.create()
-        self.profile1, _ = Profile.objects.get_or_create(user=self.user1)
-        self.client.force_login(self.user1)
-        self.recipe = RecipeFactory.create()
-        self.recipe1 = Recipe.objects.create(
-            recipe_name=self.recipe.recipe_name,
-            preparation=self.recipe.preparation,
-            user=self.profile1,
+        self.recipe_edit_page = reverse("recipe-edit", args=[self.recipe.id])
+        self.recipe_delete_page = reverse("recipe-delete", args=[self.recipe.id])
+        self.recipe_ingredient_page = reverse(
+            "recipe_ingredients:ingredient-add", args=[self.recipe.id]
         )
-        self.ingredient = IngredientFactory.create()
-        self.ingredient1 = Ingredient.objects.create(
-            name=self.ingredient.name,
-            quantity=self.ingredient.quantity,
-            quantity_type=self.ingredient.quantity_type,
-        )
-        self.recipe1.ingredient.add(self.ingredient1)
-        self.recipe_edit_page = reverse("recipe-edit", args=[self.recipe1.id])
-        self.recipe_delete_page = reverse("recipe-delete", args=[self.recipe1.id])
 
     # region tests for home view
-    def test_recipe_home_page_view_GET(self):
+    def test_recipe_home_page_view_without_recipes_GET(self):
         Recipe.objects.all().delete()
         Ingredient.objects.all().delete()
 
-        self.client.force_login(self.user1)
         response = self.client.get(self.recipes_home_page)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/home.html")
+        self.assertContains(response, "Recipes")
+        self.assertContains(response, "Add")
         self.assertContains(response, "Add recipe")
 
-    def test_recipe_home_page_view_GET_with_recipe_with_ingredient(self):
-        self.client.force_login(self.user1)
+    def test_recipe_home_page_view_GET(self):
         response = self.client.get(self.recipes_home_page)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/home.html")
+        self.assertContains(response, "Recipes")
+        self.assertContains(response, "Add")
+        self.assertContains(response, "Recipe name")
+        self.assertContains(response, self.recipe.recipe_name)
+        self.assertContains(response, "Ingredients")
         self.assertContains(
-            response, Recipe.objects.get(id=self.recipe1.id).recipe_name
+            response,
+            f"{self.recipe_ingredient_factory.amount} {self.recipe_ingredient_factory.ingredient.quantity_type} {self.recipe_ingredient_factory.ingredient.product.name}",
         )
-        self.assertContains(
-            response, Ingredient.objects.get(id=self.ingredient1.id).name
-        )
+        self.assertContains(response, "Preparation")
+        self.assertContains(response, self.recipe.preparation)
+        self.assertContains(response, "Tags")
+        self.assertContains(response, self.recipe.tags[0])
+        self.assertContains(response, f"recipes/{self.recipe.id}/edit")
+        self.assertContains(response, f"recipes/{self.recipe.id}/delete")
 
     # endregion
     # region tests for add view
@@ -63,110 +68,166 @@ class RecipesViews(TestCase):
         response = self.client.get(self.recipe_add_page)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/recipe_form.html")
+        self.assertContains(response, "Add Recipe")
+        self.assertContains(response, "Recipe name")
+        self.assertContains(response, '<input type="text" name="recipe_name"')
+        self.assertContains(response, "Ingredients")
+        self.assertContains(response, "Add ingredient")
+        self.assertContains(response, "Preparation")
+        self.assertContains(response, '<textarea name="preparation"')
+        self.assertContains(response, "Tags")
+        self.assertContains(response, '<input type="text" name="tags"')
+        self.assertContains(response, "Add")
 
-    def test_recipe_add_page_view_POST_add_ingredient(self):
-        form_data = {
-            "recipe_name": "q",
-            "preparation": "q",
-            "tags": "",
-            "add_ingredient": "",
+    def test_recipe_add_page_view_POST(self):
+        recipe_form = {
+            "recipe_name": "new recipe",
+            "preparation": "xyz",
+            "tags": "dish",
         }
-        response = self.client.post(self.recipe_add_page, form_data, follow=True)
+        response = self.client.post(self.recipe_add_page, recipe_form, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "ingredients/ingredient_form.html")
-
-    def test_recipe_edit_page_view_POST_add_ingredient(self):
-        form_data = {
-            "recipe_name": "q",
-            "preparation": "q",
-            "tags": "",
-            "add_ingredient": "",
-        }
-        response = self.client.post(self.recipe_edit_page, form_data, follow=True)
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "ingredients/ingredient_form.html")
-
-    def test_recipe_add_page_view_POST_correct_data(self):
-        Recipe.objects.all().delete()
-        Ingredient.objects.all().delete()
-
-        recipe = RecipeFactory.create()
-        recipe_data = {
-            "recipe_name": recipe.recipe_name,
-            "preparation": recipe.preparation,
-            "tags": [recipe.tags],
-        }
-
-        response = self.client.post(self.recipe_add_page, recipe_data, follow=True)
-
-        self.assertEquals(Recipe.objects.count(), 1)
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Recipe has been added")
         self.assertRedirects(response, expected_url=self.recipes_home_page)
+        self.assertContains(response, "Recipe has been added")
+        self.assertEquals(Recipe.objects.count(), 2)
+        self.assertContains(response, "new recipe")
+        self.assertContains(
+            response, f"recipes/{Recipe.objects.get(recipe_name='new recipe').id}/edit"
+        )
+        self.assertContains(
+            response,
+            f"recipes/{Recipe.objects.get(recipe_name='new recipe').id}/delete",
+        )
 
-    def test_recipe_add_page_view_POST_recipe_name_not_in_form(self):
-        """
-        recipe name is not inserted in form
-        """
-        recipe = RecipeFactory.create()
-        recipe_data = {"preparation": recipe.preparation, "tags": [recipe.tags]}
-
-        response = self.client.post(self.recipe_add_page, recipe_data, follow=True)
+    def test_recipe_add_page_view_without_recipe_name_POST(self):
+        recipe_form = {}
+        response = self.client.post(self.recipe_add_page, recipe_form, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Invalid data in recipe")
         self.assertRedirects(response, expected_url=self.recipe_add_page)
+        self.assertContains(response, "Invalid data in recipe")
+        self.assertEquals(Recipe.objects.count(), 1)
 
-    def test_recipe_add_page_view_POST_preparation_not_in_form(self):
-        """
-        preparation is not inserted in form
-        """
-        recipe = RecipeFactory.create()
-        recipe_data = {"recipe_name": recipe.recipe_name, "tags": [recipe.tags]}
-
-        response = self.client.post(self.recipe_add_page, recipe_data, follow=True)
+    def test_redirect_to_add_ingredient_from_add_recipe_POST(self):
+        recipe_form = {
+            "recipe_name": "q",
+            "add_ingredient": "add_ingredient",
+        }
+        response = self.client.post(self.recipe_add_page, recipe_form, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Invalid data in recipe")
-        self.assertRedirects(response, expected_url=self.recipe_add_page)
+        self.assertRedirects(
+            response,
+            expected_url="/recipe-ingredient/"
+            + str(Recipe.objects.get(recipe_name="q").id)
+            + "/add-ingredient/",
+        )
 
     # endregion
     # region tests for edit view
     def test_recipe_edit_page_view_GET(self):
         response = self.client.get(self.recipe_edit_page)
-        self.assertContains(response, "Edit Recipe")
-        self.assertContains(response, self.recipe1.recipe_name)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "recipes/recipe_form.html")
-
-    def test_recipe_edit_page_view_POST_correct_data(self):
-        recipe_data = {
-            "recipe_name": "check_edit",
-            "preparation": self.recipe.preparation,
-        }
-
-        response = self.client.post(self.recipe_edit_page, recipe_data, follow=True)
-        self.assertEquals(
-            Recipe.objects.get(id=self.recipe1.id).recipe_name, "check_edit"
+        self.assertContains(response, "Edit Recipe")
+        self.assertContains(response, "Recipe name")
+        self.assertContains(response, self.recipe.recipe_name)
+        self.assertContains(response, "Ingredients")
+        self.assertContains(response, "Add ingredient")
+        self.assertContains(response, "Amount")
+        self.assertContains(response, "Quantity type")
+        self.assertContains(response, "Product")
+        self.assertContains(response, self.recipe_ingredient_factory.amount)
+        self.assertContains(
+            response, self.recipe_ingredient_factory.ingredient.quantity_type
         )
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Recipe has been updated")
-        self.assertRedirects(response, expected_url=self.recipes_home_page)
+        self.assertContains(
+            response, self.recipe_ingredient_factory.ingredient.product.name
+        )
+        self.assertContains(
+            response, self.recipe_ingredient_factory.ingredient.product.name
+        )
+        self.assertContains(
+            response,
+            f"recipe-ingredient/{self.recipe.id}/edit-ingredient/{self.recipe_ingredient_factory.id}",
+        )
+        self.assertContains(
+            response,
+            f"recipe-ingredient/{self.recipe.id}/delete-ingredient/{self.recipe_ingredient_factory.id}",
+        )
+        self.assertContains(response, "Preparation")
+        self.assertContains(response, self.recipe.preparation)
+        self.assertContains(response, "Tags")
+        self.assertContains(response, self.recipe.tags[0])
+        self.assertContains(response, "Save changes")
 
-    def test_recipe_edit_page_view_POST_incorrect_data(self):
-        recipe_data = {
-            "recipe_name": "check_edit",
+    def test_recipe_edit_page_view_POST(self):
+        recipe_form = {
+            "recipe_name": "qwerty",
+            "preparation": "zxc",
+            "tags": "abc",
         }
-
-        response = self.client.post(self.recipe_edit_page, recipe_data, follow=True)
+        response = self.client.post(self.recipe_edit_page, recipe_form, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Invalid data in recipe")
+        self.assertRedirects(response, expected_url=self.recipes_home_page)
+        self.assertContains(response, "Recipe has been updated")
+        self.assertEquals(Recipe.objects.count(), 1)
+        self.assertContains(response, "qwerty")
+        self.assertEquals(Recipe.objects.get(id=self.recipe.id).recipe_name, "qwerty")
+        self.assertEquals(Recipe.objects.get(id=self.recipe.id).preparation, "zxc")
+        self.assertEquals(Recipe.objects.get(id=self.recipe.id).tags[0], "abc")
+
+    def test_recipe_edit_page_view_wrong_data_POST(self):
+        recipe_form = {}
+        response = self.client.post(self.recipe_edit_page, recipe_form, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, expected_url=self.recipe_edit_page)
+        self.assertContains(response, "Invalid data in recipe")
+        self.assertContains(response, "Edit Recipe")
+        self.assertContains(response, "Recipe name")
+        self.assertContains(response, self.recipe.recipe_name)
+        self.assertContains(response, "Ingredients")
+        self.assertContains(response, "Add ingredient")
+        self.assertContains(response, "Amount")
+        self.assertContains(response, "Quantity type")
+        self.assertContains(response, "Product")
+        self.assertContains(response, self.recipe_ingredient_factory.amount)
+        self.assertContains(
+            response, self.recipe_ingredient_factory.ingredient.quantity_type
+        )
+        self.assertContains(
+            response, self.recipe_ingredient_factory.ingredient.product.name
+        )
+        self.assertContains(
+            response, self.recipe_ingredient_factory.ingredient.product.name
+        )
+        self.assertContains(
+            response,
+            f"recipe-ingredient/{self.recipe.id}/edit-ingredient/{self.recipe_ingredient_factory.id}",
+        )
+        self.assertContains(
+            response,
+            f"recipe-ingredient/{self.recipe.id}/delete-ingredient/{self.recipe_ingredient_factory.id}",
+        )
+        self.assertContains(response, "Preparation")
+        self.assertContains(response, self.recipe.preparation)
+        self.assertContains(response, "Tags")
+        self.assertContains(response, self.recipe.tags[0])
+        self.assertContains(response, "Save changes")
+
+    def test_redirect_to_add_ingredient_from_edit_recipe_POST(self):
+        recipe_form = {
+            "recipe_name": "q",
+            "add_ingredient": "add_ingredient",
+        }
+        response = self.client.post(self.recipe_edit_page, recipe_form, follow=True)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertRedirects(response, expected_url=self.recipe_ingredient_page)
 
     # endregion
     # region tests for delete view
     def test_recipe_delete(self):
-        self.client.post(self.recipe_delete_page)
-
+        response = self.client.post(self.recipe_delete_page, follow=True)
+        self.assertContains(response, "Successfully remove recipe")
         self.assertEquals(Recipe.objects.count(), 0)
-        self.assertEquals(Ingredient.objects.count(), 0)
+        self.assertNotEquals(response, self.recipe.recipe_name)
 
     # endregion
