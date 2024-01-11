@@ -10,11 +10,11 @@ from products.models import Product
 from recipes.models import Recipe
 
 from .forms import RecipeIngredientForm
-from .models import RecipeIngredients
+from .models import RecipeIngredient
 
 
 class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
-    model = RecipeIngredients
+    model = RecipeIngredient
     form_class = RecipeIngredientForm
     template_name = "ingredients/ingredient_form.html"
     extra_context = {"title": "Add Recipe Ingredient"}
@@ -35,8 +35,6 @@ class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
-        if "add_product" in request.POST:
-            return redirect("products:product-add", recipe_id)
         if form.is_valid() and ingredient_form.is_valid():
             recipe = Recipe.objects.get(id=recipe_id)
             ingredient, created = Ingredient.objects.get_or_create(
@@ -55,7 +53,7 @@ class RecipeIngredientAddView(LoginRequiredMixin, CreateView):
 
 
 class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
-    model = RecipeIngredients
+    model = RecipeIngredient
     form_class = RecipeIngredientForm
     template_name = "ingredients/ingredient_form.html"
     extra_context = {"title": "Edit Recipe Ingredient"}
@@ -84,8 +82,6 @@ class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
         recipe_id = kwargs.get("recipe_id")
         form = self.form_class(request.POST)
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
-        if "add_product" in request.POST:
-            return redirect("products:product-add", recipe_id, ingredient_id)
         if form.is_valid() and ingredient_form.is_valid():
             ingredient, created = Ingredient.objects.get_or_create(
                 product=ingredient_form.cleaned_data.get("product_name"),
@@ -104,7 +100,7 @@ class RecipeIngredientEditView(LoginRequiredMixin, UpdateView):
 
 
 class RecipeIngredientDeleteView(LoginRequiredMixin, DeleteView):
-    model = RecipeIngredients
+    model = RecipeIngredient
 
     def get_success_url(self):
         recipe_id = self.kwargs.get("recipe_id")

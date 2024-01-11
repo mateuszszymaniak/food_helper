@@ -18,7 +18,7 @@
         {% else %}
             <button class="btn btn-outline-info" type="submit">Save changes</button>
         {%  endif %}
-        <button class="btn btn-outline-info" type="submit" name="add_product">Add Product</button>
+        <a href="{% url 'products:product-add' %}" class="btn btn-outline-info" role="button">Add Product</a>
     </div>
     </form>
 {% endblock %}

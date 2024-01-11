@@ -32,7 +32,7 @@
                 <td>
                     <form method="post" action="{% url 'recipe-delete' recipe.id %}">
                         {% csrf_token %}
-                     <input type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć przepis?')" value="Delete">
+                     <input type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete recipe?')" value="Delete">
                     </form>
                 </td>
             </tr>

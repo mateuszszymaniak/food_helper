@@ -1,12 +1,13 @@
 import factory
 from factory import SubFactory
+from factory.django import DjangoModelFactory
 
 from products.factorires import ProductFactory
 
 from .models import Ingredient
 
 
-class IngredientFactory(factory.Factory):
+class IngredientFactory(DjangoModelFactory):
     class Meta:
         model = Ingredient
 

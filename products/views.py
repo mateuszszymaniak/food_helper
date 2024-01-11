@@ -28,6 +28,8 @@ class ProductAddPageView(LoginRequiredMixin, CreateView):
     def get(self, request, *args, **kwargs):
         context = self.extra_context
         context["form"] = self.form_class
+        if "HTTP_REFERER" in request.META:
+            context["referer"] = request.META["HTTP_REFERER"]
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -36,28 +38,11 @@ class ProductAddPageView(LoginRequiredMixin, CreateView):
             product = form.save()
             product_id = product.id
             messages.success(request, "Product has been added")
-            if kwargs.get("ingredient_id"):
-                recipe_id = kwargs.get("recipe_id")
-                ingredient_id = kwargs.get("ingredient_id")
-                return redirect(
-                    "recipe_ingredients:ingredient-edit",
-                    recipe_id,
-                    ingredient_id,
-                    product_id,
-                )
-            if kwargs.get("recipe_id"):
-                recipe_id = kwargs.get("recipe_id")
-                return redirect(
-                    "recipe_ingredients:ingredient-add", recipe_id, product_id
-                )
-            if kwargs.get("new"):
-                return redirect("my_ingredients:useringredient-add", product_id)
-            if kwargs.get("my_ingredient_id"):
-                my_ingredient_id = kwargs.get("my_ingredient_id")
-                return redirect(
-                    "my_ingredients:useringredient-edit", my_ingredient_id, product_id
-                )
-            return redirect("products:products-home-page")
+            if self.extra_context.get(
+                "referer"
+            ) is None or "/product/" in self.extra_context.get("referer"):
+                return redirect("products:products-home-page")
+            return redirect(self.extra_context.get("referer").__add__(f"{product_id}"))
         else:
             messages.warning(request, "Invalid data in product")
             return redirect("products:product-add")

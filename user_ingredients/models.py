@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from ingredients.models import Ingredient
@@ -11,4 +12,4 @@ class UserIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient, on_delete=models.DO_NOTHING, null=False, blank=False
     )
-    amount = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField(validators=[MinValueValidator(1)])
