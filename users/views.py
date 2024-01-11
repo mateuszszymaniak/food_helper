@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import AuthenticationForm, LoginView, PasswordResetView
 from django.shortcuts import redirect, render
@@ -13,7 +12,7 @@ from .forms import MyResetPasswordForm, UserRegisterForm
 
 
 class CustomAuthForm(AuthenticationForm):
-    error_messages = {"invalid_login": "Wrong email or password"}
+    error_messages = {"invalid_login": "Wrong username or password"}
 
 
 class MyResetPasswordView(PasswordResetView):
@@ -34,14 +33,14 @@ class MyResetPasswordView(PasswordResetView):
         if new_password == confirm_new_password:
             user.set_password(new_password)
             user.save()
-            messages.success(self.request, "Password successfully reset.")
+            messages.success(self.request, "Password successfully reset")
             return redirect("login-page")
         else:
             messages.error(self.request, "Passwords are not the same")
             return redirect("reset-password-page")
 
     def form_invalid(self, form):
-        messages.error(self.request, "Invalid form submission")
+        messages.error(self.request, "Invalid data in reset password form")
         return super().form_invalid(form)
 
 
@@ -51,7 +50,7 @@ class MyLoginView(LoginView):
     success_url = reverse_lazy("users/home.html")
 
 
-class HomePageView(LoginRequiredMixin, View):
+class HomePageView(View):
     template_name = "users/home.html"
     context = {"title": "Home Page"}
 
