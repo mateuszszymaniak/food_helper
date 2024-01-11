@@ -3,7 +3,7 @@ from django.db import models
 from ingredients.models import Ingredient
 
 
-class RecipeIngredients(models.Model):
+class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.DO_NOTHING)
     amount = models.PositiveIntegerField()
 
