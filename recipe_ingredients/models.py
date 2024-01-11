@@ -4,7 +4,7 @@ from django.db import models
 from ingredients.models import Ingredient
 
 
-class RecipeIngredient(models.Model):
+class RecipeIngredients(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.DO_NOTHING)
     amount = models.PositiveIntegerField(validators=[MinValueValidator(1)])
 
