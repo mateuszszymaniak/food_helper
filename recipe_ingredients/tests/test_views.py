@@ -199,7 +199,7 @@ class RecipeIngredientsViews(TestCase):
         self.assertContains(response, "Successfully edited ingredient")
         self.assertEquals(RecipeIngredient.objects.count(), 1)
         self.assertContains(response, new_product.name)
-        self.recipe_ingredient_factory.refresh_from_db()  # działa -> zaktualizowac testy
+        self.recipe_ingredient_factory.refresh_from_db()
         self.assertEquals(self.recipe_ingredient_factory.amount, 10)
         self.assertEquals(self.recipe_ingredient_factory.ingredient.quantity_type, "l")
         self.assertEquals(
