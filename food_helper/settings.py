@@ -95,7 +95,7 @@ if env("ENVIRONMENT") == "ci":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": "cidb.sqlite3",
+            "NAME": "cidb",
         }
     }
 else:
