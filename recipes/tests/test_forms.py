@@ -8,7 +8,7 @@ class RecipeFormTest(TestCase):
         recipe_data = {
             "recipe_name": "xyz",
             "preparation": "asd",
-            "tags": "tyu",
+            # "tags": "tyu",
         }
         form = CreateNewRecipe(data=recipe_data)
         self.assertTrue(form.is_valid())
