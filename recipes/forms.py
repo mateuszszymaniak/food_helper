@@ -6,7 +6,7 @@ from .models import Recipe
 class CreateNewRecipe(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ["recipe_name", "preparation", "tags"]
+        fields = ["recipe_name", "preparation"]
 
     def __init__(self, *args, **kwargs):
         super(CreateNewRecipe, self).__init__(*args, **kwargs)

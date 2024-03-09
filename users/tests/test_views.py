@@ -65,8 +65,8 @@ class TestViews(TestCase):
         )
         self.assertContains(response, "Preparation")
         self.assertContains(response, self.recipe_factory.preparation)
-        self.assertContains(response, "Tags")
-        self.assertContains(response, self.recipe_factory.tags[0])
+        # self.assertContains(response, "Tags")
+        # self.assertContains(response, self.recipe_factory.tags[0])
 
     def test_home_page_view_user_logged_with_recipe_without_ingredient_GET(self):
         Product.objects.all().delete()
@@ -170,8 +170,8 @@ class TestViews(TestCase):
         )
         self.assertContains(response, "Preparation")
         self.assertContains(response, self.recipe_factory.preparation)
-        self.assertContains(response, "Tags")
-        self.assertContains(response, self.recipe_factory.tags[0])
+        # self.assertContains(response, "Tags")
+        # self.assertContains(response, self.recipe_factory.tags[0])
 
     def test_login_page_view_wrong_username_POST(self):
         login_data = {

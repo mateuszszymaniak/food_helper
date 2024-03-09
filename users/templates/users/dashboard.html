@@ -22,7 +22,7 @@
                         <th>Recipe Name</th>
                         <th>Ingredients</th>
                         <th>Preparation</th>
-                        <th>Tags</th>
+{#                        <th>Tags</th>#}
                     </tr>
                 </thead>
                 <tbody>
@@ -35,11 +35,11 @@
                 {% endfor %}
                 </td>
                 <td>{{ recipe.preparation }}</td>
-                {% if recipe.tags %}
-                    <td>{% for tag in recipe.tags %}{{ tag }}{% endfor %}</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
+{#                {% if recipe.tags %}#}
+{#                    <td>{% for tag in recipe.tags %}{{ tag }}{% endfor %}</td>#}
+{#                {% else %}#}
+{#                    <td></td>#}
+{#                {% endif %}#}
             </tr>
         {% endfor %}
                 </tbody>

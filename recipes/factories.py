@@ -10,4 +10,4 @@ class RecipeFactory(DjangoModelFactory):
 
     recipe_name = factory.Faker("word")
     preparation = factory.Faker("text")
-    tags = factory.Faker("pylist", nb_elements=1, value_types="word")
+    # tags = factory.Faker("pylist", nb_elements=1, value_types="word")

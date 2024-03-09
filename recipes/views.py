@@ -21,7 +21,7 @@ class RecipesHomePageView(LoginRequiredMixin, ListView):
                 "id": recipe.id,
                 "recipe_name": recipe.recipe_name,
                 "preparation": recipe.preparation,
-                "tags": recipe.tags,
+                # "tags": recipe.tags,
                 "ingredients": [],
             }
 
@@ -80,7 +80,7 @@ class RecipeEditPageView(LoginRequiredMixin, UpdateView):
             initial={
                 "recipe_name": recipe.recipe_name,
                 "preparation": recipe.preparation,
-                "tags": recipe.tags,
+                # "tags": recipe.tags,
                 "recipe_id": recipe_id,
             }
         )
@@ -94,7 +94,7 @@ class RecipeEditPageView(LoginRequiredMixin, UpdateView):
             self.model.objects.filter(id=recipe_id).update(
                 recipe_name=form.cleaned_data.get("recipe_name"),
                 preparation=form.cleaned_data.get("preparation"),
-                tags=form.cleaned_data.get("tags"),
+                # tags=form.cleaned_data.get("tags"),
             )
             if "add_ingredient" in request.POST:
                 return redirect("recipe_ingredients:ingredient-add", recipe_id)
