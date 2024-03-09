@@ -10,7 +10,7 @@
                         <td>Recipe name</td>
                         <td>Ingredients</td>
                         <td>Preparation</td>
-                        <td>Tags</td>
+{#                        <td>Tags</td>#}
                     </tr>
                 </thead>
                 <tbody>
@@ -23,11 +23,11 @@
                 {% endfor %}
                 </td>
                 <td>{{ recipe.preparation }}</td>
-                {% if recipe.tags %}
-                    <td>{% for tag in recipe.tags %}{{ tag }}{% endfor %}</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
+{#                {% if recipe.tags %}#}
+{#                    <td>{% for tag in recipe.tags %}{{ tag }}{% endfor %}</td>#}
+{#                {% else %}#}
+{#                    <td></td>#}
+{#                {% endif %}#}
                 <td><a href="{% url 'recipe-edit' recipe.id %}" class="btn btn-primary" role="button">Edit</a></td>
                 <td>
                     <form method="post" action="{% url 'recipe-delete' recipe.id %}">

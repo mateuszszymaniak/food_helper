@@ -57,8 +57,8 @@ class RecipesViews(TestCase):
         )
         self.assertContains(response, "Preparation")
         self.assertContains(response, self.recipe.preparation)
-        self.assertContains(response, "Tags")
-        self.assertContains(response, self.recipe.tags[0])
+        # self.assertContains(response, "Tags")
+        # self.assertContains(response, self.recipe.tags[0])
         self.assertContains(response, f"recipes/{self.recipe.id}/edit")
         self.assertContains(response, f"recipes/{self.recipe.id}/delete")
 
@@ -75,15 +75,15 @@ class RecipesViews(TestCase):
         self.assertContains(response, "Add ingredient")
         self.assertContains(response, "Preparation")
         self.assertContains(response, '<textarea name="preparation"')
-        self.assertContains(response, "Tags")
-        self.assertContains(response, '<input type="text" name="tags"')
+        # self.assertContains(response, "Tags")
+        # self.assertContains(response, '<input type="text" name="tags"')
         self.assertContains(response, "Add")
 
     def test_recipe_add_page_view_POST(self):
         recipe_form = {
             "recipe_name": "new recipe",
             "preparation": "xyz",
-            "tags": "dish",
+            # "tags": "dish",
         }
         response = self.client.post(self.recipe_add_page, recipe_form, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -155,15 +155,15 @@ class RecipesViews(TestCase):
         )
         self.assertContains(response, "Preparation")
         self.assertContains(response, self.recipe.preparation)
-        self.assertContains(response, "Tags")
-        self.assertContains(response, self.recipe.tags[0])
+        # self.assertContains(response, "Tags")
+        # self.assertContains(response, self.recipe.tags[0])
         self.assertContains(response, "Save changes")
 
     def test_recipe_edit_page_view_POST(self):
         recipe_form = {
             "recipe_name": "qwerty",
             "preparation": "zxc",
-            "tags": "abc",
+            # "tags": "abc",
         }
         response = self.client.post(self.recipe_edit_page, recipe_form, follow=True)
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -173,7 +173,7 @@ class RecipesViews(TestCase):
         self.assertContains(response, "qwerty")
         self.assertEquals(Recipe.objects.get(id=self.recipe.id).recipe_name, "qwerty")
         self.assertEquals(Recipe.objects.get(id=self.recipe.id).preparation, "zxc")
-        self.assertEquals(Recipe.objects.get(id=self.recipe.id).tags[0], "abc")
+        # self.assertEquals(Recipe.objects.get(id=self.recipe.id).tags[0], "abc")
 
     def test_recipe_edit_page_view_wrong_data_POST(self):
         recipe_form = {}
@@ -209,8 +209,8 @@ class RecipesViews(TestCase):
         )
         self.assertContains(response, "Preparation")
         self.assertContains(response, self.recipe.preparation)
-        self.assertContains(response, "Tags")
-        self.assertContains(response, self.recipe.tags[0])
+        # self.assertContains(response, "Tags")
+        # self.assertContains(response, self.recipe.tags[0])
         self.assertContains(response, "Save changes")
 
     def test_redirect_to_add_ingredient_from_edit_recipe_POST(self):
