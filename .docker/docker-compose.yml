@@ -1,0 +1,27 @@
+name: food_helper
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: .docker/Dockerfile
+    container_name: web-app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition:
+          service_healthy
+    volumes:
+      - .:/usr/app
+  db:
+    image: postgres
+    container_name: postgres_db
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ['CMD', "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 30s
+      retries: 6
