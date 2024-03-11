@@ -49,3 +49,14 @@ jobs:
         DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         DB_HOST: ${{ vars.POSTGRES_HOST }}
         DB_PORT: 5432
+
+    - name: Run Bandit
+      run: | 
+        bandit -r ../../.
+    - name: Run Safety
+      run: | 
+        safety check
+      continue-on-error: true
+    - name: Run Ruff
+      run: |
+        ruff check ../../.
