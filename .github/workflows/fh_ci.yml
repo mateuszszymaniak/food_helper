@@ -52,11 +52,11 @@ jobs:
 
     - name: Run Bandit
       run: | 
-        bandit -r ../../.
+        bandit -r .
     - name: Run Safety
       run: | 
         safety check
       continue-on-error: true
     - name: Run Ruff
       run: |
-        ruff check ../../.
+        ruff check .
