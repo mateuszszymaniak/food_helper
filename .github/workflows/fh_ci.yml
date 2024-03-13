@@ -52,10 +52,10 @@ jobs:
         DB_PORT: 5432
 
     - name: Run Bandit
-      run: | 
+      run: |
         poetry run bandit -r .
     - name: Run Safety
-      run: | 
+      run: |
         poetry run safety check
       continue-on-error: true
     - name: Run Ruff

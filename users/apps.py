@@ -6,4 +6,4 @@ class UserConfig(AppConfig):
     name = "users"
 
     def ready(self):
-        from .signals import create_profile # noqa: F401
+        from .signals import create_profile  # noqa: F401

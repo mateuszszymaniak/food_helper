@@ -6,4 +6,4 @@ class RecipesConfig(AppConfig):
     name = "recipes"
 
     def ready(self):
-        from .signals import pre_delete_recipe # noqa: F401
+        from .signals import pre_delete_recipe  # noqa: F401
