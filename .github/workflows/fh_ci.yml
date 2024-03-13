@@ -53,11 +53,11 @@ jobs:
 
     - name: Run Bandit
       run: | 
-        bandit -r .
+        poetry run bandit -r .
     - name: Run Safety
       run: | 
-        safety check
+        poetry run safety check
       continue-on-error: true
     - name: Run Ruff
       run: |
-        ruff check .
+        poetry run ruff check .
