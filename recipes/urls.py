@@ -11,7 +11,7 @@ urlpatterns = [
     path("recipes/", RecipesHomePageView.as_view(), name="recipes-home-page"),
     path("recipes/add/", RecipeAddPageView.as_view(), name="recipe-add"),
     path(
-        "recipes/<int:recipe_id>/edit/",
+        "recipes/<int:pk>/edit/",
         RecipeEditPageView.as_view(),
         name="recipe-edit",
     ),

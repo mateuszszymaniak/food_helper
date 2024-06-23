@@ -67,7 +67,7 @@ class RecipesViews(TestCase):
     def test_recipe_add_page_view_GET(self):
         response = self.client.get(self.recipe_add_page)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "recipes/recipe_form.html")
+        self.assertTemplateUsed(response, "recipes/recipe_form_new.html")
         self.assertContains(response, "Add Recipe")
         self.assertContains(response, "Recipe name")
         self.assertContains(response, '<input type="text" name="recipe_name"')
@@ -126,7 +126,7 @@ class RecipesViews(TestCase):
     def test_recipe_edit_page_view_GET(self):
         response = self.client.get(self.recipe_edit_page)
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, "recipes/recipe_form.html")
+        self.assertTemplateUsed(response, "recipes/recipe_form_edit.html")
         self.assertContains(response, "Edit Recipe")
         self.assertContains(response, "Recipe name")
         self.assertContains(response, self.recipe.recipe_name)

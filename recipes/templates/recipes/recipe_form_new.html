@@ -1,0 +1,57 @@
+{% extends 'users/dashboard_base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                {{ form.recipe_name|as_crispy_field }}
+                Ingredients
+                <div>
+                    <button class="btn btn-primary" type="submit" name="add_ingredient">Add ingredient</button>
+                </div>
+                {% if ingredients.count > 0 %}
+                    <table id="ingredient-table" class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <td>Amount</td>
+                            <td>Quantity type</td>
+                            <td>Product</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr style="display: none">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><form></form></td>
+                    </tr>
+                    {% for ingredient in ingredients %}
+                        <tr>
+                            <td>{{ ingredient.amount }}</td>
+                            <td>{{ ingredient.ingredient.quantity_type }}</td>
+                            <td>{{ ingredient.ingredient.product.name }}</td>
+                            <td><a href="{% url 'recipe_ingredients:ingredient-edit' form.initial.recipe_id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                            <td>
+                                <form method="post" action="{% url 'recipe_ingredients:ingredient-delete' form.initial.recipe_id ingredient.id %}">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete ingredient?')" value="Delete">
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                {% endif %}
+                {{ form.preparation|as_crispy_field }}
+{#                {{ form.tags|as_crispy_field }}#}
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Add</button>
+            </div>
+            </fieldset>
+        </form>
+    </div>
+{% endblock %}
