@@ -1,6 +1,8 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
 
+from .api.views import APIRegisterView, MyObtainTokenPairView
 from .views import (
     HomePageView,
     MyLoginView,
@@ -28,4 +30,7 @@ urlpatterns = [
         MyResetPasswordView.as_view(template_name="users/reset_password.html"),
         name="reset-password-page",
     ),
+    path("api/auth/login/", MyObtainTokenPairView.as_view(), name="token-obtain-view"),
+    path("api/auth/login/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    path("api/auth/register/", APIRegisterView.as_view(), name="auth-register"),
 ]

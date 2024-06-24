@@ -18,5 +18,8 @@ class Ingredient(models.Model):
         choices=AMOUNT_TYPE_CHOICES,
     )
 
+    class Meta:
+        unique_together = ["product", "quantity_type"]
+
     def __str__(self):
         return f"{self.product.name}, {self.quantity_type}"

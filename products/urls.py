@@ -1,5 +1,7 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import SimpleRouter
 
+from .api.views import ProductsViewSet
 from .views import (
     ProductAddPageView,
     ProductDeleteView,
@@ -8,6 +10,9 @@ from .views import (
 )
 
 app_name = "products"
+
+router = SimpleRouter()
+router.register("products", ProductsViewSet)
 
 urlpatterns = [
     path("product/", ProductHomePageView.as_view(), name="products-home-page"),
@@ -22,4 +27,5 @@ urlpatterns = [
         ProductDeleteView.as_view(),
         name="product-delete",
     ),
+    path("api/", include(router.urls)),
 ]
