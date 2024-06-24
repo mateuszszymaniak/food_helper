@@ -109,11 +109,24 @@ class UserIngredientsEditPageView(LoginRequiredMixin, UpdateView):
         ingredient_form = IngredientForm(request.POST, prefix="ingredient")
         if form.is_valid() and ingredient_form.is_valid():
             ingredient, created = find_ingredient(ingredient_form.cleaned_data)
-            self.model.objects.filter(id=my_ingredient_id).update(
+            did_user_have_ingredient = self.model.objects.filter(
+                user=request.user.profile,
                 ingredient=ingredient,
-                amount=form.cleaned_data.get("amount"),
-            )
-            messages.success(request, "Successfully edited my ingredient")
+            ).first()
+            if did_user_have_ingredient:
+                did_user_have_ingredient.amount += form.cleaned_data.get("amount")
+                did_user_have_ingredient.save()
+                messages.success(
+                    request,
+                    f"{did_user_have_ingredient.ingredient.product.name} has been added previously. Amount was updated",
+                )
+                UserIngredient.objects.get(id=my_ingredient_id).delete()
+            else:
+                self.model.objects.filter(id=my_ingredient_id).update(
+                    ingredient=ingredient,
+                    amount=form.cleaned_data.get("amount"),
+                )
+                messages.success(request, "Successfully edited my ingredient")
             return redirect("my_ingredients:useringredients-home-page")
         else:
             messages.warning(request, "Invalid data in editing my ingredient")

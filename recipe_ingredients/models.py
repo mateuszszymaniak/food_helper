@@ -10,3 +10,6 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return f"{self.ingredient}, {self.amount}"
+
+    class Meta:
+        unique_together = ["amount", "ingredient"]

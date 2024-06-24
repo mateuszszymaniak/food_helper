@@ -1,5 +1,7 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import SimpleRouter
 
+from .api.views import UserIngredientViewSet
 from .views import (
     UserIngredientsAddPageView,
     UserIngredientsDeletePageView,
@@ -8,6 +10,9 @@ from .views import (
 )
 
 app_name = "my_ingredients"
+
+router = SimpleRouter()
+router.register("user-ingredients", UserIngredientViewSet)
 
 urlpatterns = [
     path(
@@ -40,4 +45,5 @@ urlpatterns = [
         UserIngredientsDeletePageView.as_view(),
         name="useringredient-delete",
     ),
+    path("api/", include(router.urls)),
 ]

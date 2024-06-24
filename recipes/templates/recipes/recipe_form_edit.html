@@ -34,9 +34,9 @@
                             <td>{{ ingredient.amount }}</td>
                             <td>{{ ingredient.ingredient.quantity_type }}</td>
                             <td>{{ ingredient.ingredient.product.name }}</td>
-                            <td><a href="{% url 'recipe_ingredients:ingredient-edit' form.initial.recipe_id ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
+                            <td><a href="{% url 'recipe_ingredients:ingredient-edit' form.initial.recipe_id.pk ingredient.id %}" class="btn btn-primary" role="button">Edit</a></td>
                             <td>
-                                <form method="post" action="{% url 'recipe_ingredients:ingredient-delete' form.initial.recipe_id ingredient.id %}">
+                                <form method="post" action="{% url 'recipe_ingredients:ingredient-delete' form.initial.recipe_id.pk ingredient.id %}">
                                     {% csrf_token %}
                                     <input type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete ingredient?')" value="Delete">
                                 </form>
@@ -49,11 +49,7 @@
                 {{ form.preparation|as_crispy_field }}
 {#                {{ form.tags|as_crispy_field }}#}
             <div class="form-group">
-                {% if "Add" in title %}
-                <button class="btn btn-outline-info" type="submit">Add</button>
-                {% else %}
                 <button class="btn btn-outline-info" type="submit">Save changes</button>
-                {% endif %}
             </div>
             </fieldset>
         </form>

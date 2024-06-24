@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
-from .forms import CreateNewRecipe
+from .forms import CreateNewRecipe, EditRecipe
 from .models import Recipe
 
 
@@ -43,7 +43,7 @@ class RecipesHomePageView(LoginRequiredMixin, ListView):
 class RecipeAddPageView(LoginRequiredMixin, CreateView):
     model = Recipe
     form_class = CreateNewRecipe
-    template_name = "recipes/recipe_form.html"
+    template_name = "recipes/recipe_form_new.html"
     extra_context = {"title": "Add Recipe"}
 
     def get(self, request, *args, **kwargs):
@@ -68,13 +68,13 @@ class RecipeAddPageView(LoginRequiredMixin, CreateView):
 
 class RecipeEditPageView(LoginRequiredMixin, UpdateView):
     model = Recipe
-    form_class = CreateNewRecipe
-    template_name = "recipes/recipe_form.html"
+    form_class = EditRecipe
+    template_name = "recipes/recipe_form_edit.html"
     extra_context = {"title": "Edit Recipe"}
 
     def get(self, request, *args, **kwargs):
-        recipe_id = kwargs.get("recipe_id")
-        recipe = get_object_or_404(self.model, pk=recipe_id)
+        recipe_id = self.get_object()
+        recipe = get_object_or_404(self.model, pk=recipe_id.pk)
         context = self.extra_context
         context["form"] = self.form_class(
             initial={
@@ -88,21 +88,21 @@ class RecipeEditPageView(LoginRequiredMixin, UpdateView):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        recipe_id = kwargs.get("recipe_id")
-        form = self.form_class(request.POST)
+        recipe_id = self.get_object()
+        form = self.form_class(request.POST, instance=recipe_id)
         if form.is_valid():
-            self.model.objects.filter(id=recipe_id).update(
+            self.model.objects.filter(id=recipe_id.pk).update(
                 recipe_name=form.cleaned_data.get("recipe_name"),
                 preparation=form.cleaned_data.get("preparation"),
                 # tags=form.cleaned_data.get("tags"),
             )
             if "add_ingredient" in request.POST:
-                return redirect("recipe_ingredients:ingredient-add", recipe_id)
+                return redirect("recipe_ingredients:ingredient-add", recipe_id.pk)
             messages.success(request, "Recipe has been updated")
             return redirect("recipes-home-page")
         else:
             messages.warning(request, "Invalid data in recipe")
-            return redirect("recipe-edit", recipe_id)
+            return redirect("recipe-edit", recipe_id.pk)
 
 
 class RecipeDeleteView(LoginRequiredMixin, DeleteView):

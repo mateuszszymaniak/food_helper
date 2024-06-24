@@ -13,3 +13,6 @@ class UserIngredient(models.Model):
         Ingredient, on_delete=models.DO_NOTHING, null=False, blank=False
     )
     amount = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+
+    class Meta:
+        unique_together = ["user", "ingredient"]
